@@ -1,0 +1,74 @@
+﻿@using Axatel.Models
+
+@{
+    string idmemb = ViewBag.Memb;
+    
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackList телефонии Axatel</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery-1.11.3.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+</head>
+<body class="body-content">
+
+    <div>
+        @Html.Partial("/Views/Shared/header.cshtml", idmemb)
+        <div class="main">
+            <div class="info">
+                <h4>Поддержка Axatel</h4>
+                <p>
+                    Обращения партнеров в Техническую поддержку мы стремимся обработать в течение 5 рабочих часов. Режим работы - с 10 до 19 часов , кроме праздников и выходных
+                    По телефону техническая поддержка не оказывается! Обратиться в Службу технической поддержки можно через форму связи. Для ответов на уже созданные обращения в техподдержку можно использовать почтовые сообщения.
+                </p>
+            </div>
+            <div>
+                <form action="/tiket" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="member_id" value="@idmemb">
+                    <p style="color:red;">@ViewBag.Error</p>
+                    <p style="color:forestgreen;">@ViewBag.Ok</p>
+                    <table>
+                        <tbody>
+                            <tr><td>Заголовок обращения: </td><td><input name="title" type="text" value="@ViewBag.Title" maxlength="50" class="inputst"></td></tr>
+                            <tr><td>E-mail для обратной связи: </td><td><input name="email" type="text" value="@ViewBag.Email" maxlength="50" class="inputst"></td></tr>
+                            <tr><td>Текст обращения: </td><td><textarea name="text" class="inputst" style="width: 703px; height: 279px;">@ViewBag.Text</textarea></td></tr>
+
+                            <tr><td colspan="2" style="text-align:center;"><input style="margin-top:10px;text-align: center;width: 100px;cursor: pointer;" class="submitst" type="submit" value="Отправить"></td></tr>
+                        </tbody>
+                    </table>
+                </form>
+
+                 </div>
+        </div>
+
+        <footer>
+            <p>
+                &copy; @DateTime.Now.Year - Все права защищены. Powered by AXATA
+            </p>
+        </footer>
+    </div>
+    <style>
+        .main td {
+            text-align: left;
+            border: none;
+        }
+        textarea {
+            max-width: 780px;
+        }
+    </style>
+    <script>
+
+      
+    </script>
+
+</body>
+</html>
+
+

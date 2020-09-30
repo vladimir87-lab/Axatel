@@ -1,0 +1,124 @@
+﻿@using Axatel.Models
+@model List<BlackList>
+@{
+    string idmemb = ViewBag.Memb;
+    ViewBag.Title = "MainPage";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackList телефонии Axatel</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery-1.11.3.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    
+</head>
+<body class="body-content">
+
+    <div>
+        @Html.Partial("/Views/Shared/header.cshtml", idmemb)
+        <div class="main">
+            <div class="info">
+                <h4>BlackList телефонии Axatel</h4>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Номер</th><th>Дата занесения</th><th>Удалить</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <tr><td>@item.Id</td><td>@item.Numb</td><td>@item.Date.ToString("dd.MM.yyyy")</td><td><img src="~/Content/images/cros.png"  style="cursor:pointer;" onclick="dellblacklist('@item.Id')"></td></tr>
+                    }
+                </tbody>
+            </table>
+            <input style="margin-top:10px;text-align: center;width: 100px;cursor: pointer;" class="submitst" value="Добавить" onclick="opendialog()">
+        </div>
+
+        <footer>
+            <p>
+                &copy; @DateTime.Now.Year - Все права защищены. Powered by AXATA
+            </p>
+        </footer>
+    </div>
+    <style>
+        .bay-akk-dialog {
+        width:400px !important;
+        }
+    </style>
+    <script>
+        
+        function dellblacklist(id) {
+            if (confirm('Удалить из списка номер?'))
+            {
+            
+            $.ajax({
+                type: "POST",
+                url: "/dellblacklist",
+                data: { id: id, member_id: '@idmemb'  },
+                success: function (data) {
+                    if (data == "ok") {                       
+                        window.location.replace('/blacklist?member_id=' + '@idmemb');
+                    }
+                }
+            });
+            }else{
+                return;
+            }
+        }
+
+        function opendialog() {
+
+            $(".body-content").append("<div class='popup'><div class='popup_bg'></div>" + //Добавляем в тело документа разметку всплывающего окна
+                "<div class='bay-akk-dialog'><div class='close_cros' style='position: absolute; background-image: url(\"/Content/images/close.png\"); width: 32px; height: 32px; top: -2px; right: 0px; cursor: pointer;'></div>" +
+                "<div><h3>Номер телефона</h3></div>" +
+                "<div><input id='addnumb' onkeypress='checkNumber' type='text' value='' class='inputst'></div>" +
+                "<div><input style='margin-top:10px; text-align:center; width:100px; cursor:pointer;' class='submitst' value='Добавить' onclick='addnumb()'></div>" +
+                "</div></div>");
+
+            $(".popup").fadeIn(400); // Медленно выводим изображение
+            function checkNumber(e) {
+                e = e || window.event;
+                if (e.ctrlKey || e.altKey) return;
+                var c = e.charCode || e.keyCode;
+                if (e.charCode == 0 && (e.keyCode == 8 || e.keyCode == 35 || e.keyCode == 36 || e.keyCode == 37 || e.keyCode == 39)) return;
+                return ((c > 47) && (c < 58) || c == 43);
+            };
+            document.getElementById('addnumb').onkeypress = checkNumber;
+            $(".close_cros").click(function () {    // Событие клика на затемненный фон
+                $(".popup").fadeOut(400);    // Медленно убираем всплывающее окно
+                setTimeout(function () {    // Выставляем таймер
+                    $(".popup").remove(); // Удаляем разметку всплывающего окна
+                }, 400);
+            });
+        };
+
+        function addnumb() {
+            var numb = $('#addnumb').val();
+            $.ajax({
+                type: "POST",
+                url: "/addnumb",
+                data: { numb: numb, member_id: '@idmemb'  },
+                success: function (data) {
+                    if (data == "ok") {
+                        $(".popup").fadeOut(400);    // Медленно убираем всплывающее окно
+                        setTimeout(function () {    // Выставляем таймер
+                            $(".popup").remove(); // Удаляем разметку всплывающего окна
+                        }, 400);
+                        window.location.replace('/blacklist?member_id=' + '@idmemb');
+                    }
+                }
+            });
+        }
+
+
+    </script>
+
+</body>
+</html>
+
+

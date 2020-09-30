@@ -1,0 +1,290 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+h1, h2, h3, h4, h5 {
+    color: #074355 !important;
+}
+
+.main {
+    width: 1300px;
+    margin: 0px auto;
+}
+.info {
+    margin: 20px 10px 0px 0px;
+}
+.info span {
+   display:inline-block;
+   margin:3px;
+}
+
+footer {
+    position: absolute;
+    bottom: 0px;
+}
+
+.alink {
+    background: #9f4141;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 3px;
+    border: 1px solid #561010;
+    text-decoration: none;
+}
+
+    .alink:hover {
+        background: #561010;
+        text-decoration: none;
+        color: #fff;
+    }
+
+
+td, th {
+    border: 1px solid #dfdfdf;
+    padding: 5px !important;
+    text-align: center;
+}
+
+th {
+    text-align: center !important;
+}
+
+.main a {
+    color: #2b7a82 !important;
+}
+
+    .main a:hover {
+        color: #36b8c6 !important;
+    }
+.navbar-brand {
+    color: #fff !important;
+}
+.navbar-inverse {
+    background-color: #288fb7 !important;
+    border-color: #080808;
+}
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+    border-color: #288fb7 !important;
+}
+
+.inputst {
+    border: 1px solid #eaeaea;
+    padding: 2px 5px;
+    border-radius: 2px;
+    width: 480px;
+}
+
+    .inputst:focus {
+        border: 1px solid #13b4ce;
+    }
+
+.submitst {
+    background: #288fb7;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 3px;
+    border: 1px solid #024c5e;
+}
+
+
+    .submitst:hover {
+        background: rgb(33, 188, 196) none repeat scroll 0% 0%;
+    }
+
+.filter1 {
+    display: inline-block;
+    padding: 5px 10px;
+    vertical-align: top;
+}
+
+.multiselect {
+    width: 200px;
+}
+
+.selectBox {
+    position: relative;
+}
+
+    .selectBox select {
+        width: 100%;
+        font-weight: bold;
+    }
+
+.overSelect {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+
+.block-checkbox {
+    display: none;
+    border-bottom: 1px #cbcbcb solid;
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    max-height: 500px;
+    overflow: auto;
+    width: 200px;
+    text-align: left;
+    z-index: 5;
+    border-radius: 5px;
+    border-left: 1px #cbcbcb solid;
+    border-right: 1px #cbcbcb solid;
+    box-shadow: 4px 3px 8px 4px rgba(2, 2, 24, 0.2);
+}
+
+    .block-checkbox span {
+        color: #474747;
+        position: relative;
+        top: -1px;
+        left: 3px;
+    }
+
+
+    .block-checkbox label {
+        display: block;
+        padding: 3px;
+    }
+
+        .block-checkbox label:hover {
+            background-color: #fbf8f8;
+        }
+
+label {
+    margin-bottom: 0px !important;
+}
+/*стилизация чекбокс*/
+input[type="checkbox"] {
+    display: none;
+}
+
+    input[type="checkbox"] + label {
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        /*margin-bottom: 20px;*/
+        font: 14px/20px 'Open Sans', Arial, sans-serif;
+        color: #ddd;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+
+        input[type="checkbox"] + label:last-child {
+            margin-bottom: 0;
+        }
+
+        input[type="checkbox"] + label:before {
+            content: '';
+            display: block;
+            width: 15px;
+            height: 15px;
+            border: 2px solid #107484;
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            opacity: .6;
+            -webkit-transition: all .12s, border-color .08s;
+            transition: all .12s, border-color .08s;
+            border-radius: 2px;
+        }
+
+    input[type="checkbox"]:checked + label:before {
+        width: 10px;
+        top: 2px;
+        left: 10px;
+        border-radius: 0;
+        opacity: 1;
+        border-top-color: transparent;
+        border-left-color: transparent;
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+/*стилизация чекбокс*/
+
+.popup {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    display: none;
+    text-align: center;
+    z-index: 3;
+}
+
+.popup_bg {
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    z-index: 4;
+    height: 100%;
+    width: 100%;
+}
+
+.popup_img {
+    position: relative;
+    z-index: 5;
+    height: 90%;
+    border-radius: 5px;
+    top: 5%;
+    max-width: 100%;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.bay-akk-dialog {
+    background-color: #fff;
+    display: inline-block;
+    left: 50%;
+    opacity: 1;
+    padding: 15px;
+    position: fixed;
+    text-align: center;
+    top: 50%;
+    width: 500px;
+    z-index: 10;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+    -ms-box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+    -o-box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+    -webkit-transition: opacity .5s, top .5s;
+    -moz-transition: opacity .5s, top .5s;
+    -ms-transition: opacity .5s, top .5s;
+    -o-transition: opacity .5s, top .5s;
+    transition: opacity .5s, top .5s;
+}
+

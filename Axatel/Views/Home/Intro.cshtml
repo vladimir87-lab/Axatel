@@ -1,0 +1,104 @@
+﻿@using Axatel.Models
+
+@{
+    string idmemb = ViewBag.Memb;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axatel</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery-1.11.3.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="//api.bitrix24.com/api/v1/dev/"></script>
+</head>
+<body class="body-content">
+    <script>
+        BX24.init(function () {
+            $(document).ready(function () {
+
+                BX24.installFinish();
+            });
+        });
+
+    </script>
+
+    <div>
+
+        <div class="main" style="max-width: 1300px;">
+            <h2 style="text-align: center;">IP-ТЕЛЕФОНИЯ СОВРЕМЕННОГО БИЗНЕСА</h2>
+            <div class="leff">
+                <form action="/intro" method="post" enctype="multipart/form-data" style="display: inline-block;">
+                    <input type="hidden" name="member_id" value="@idmemb">
+                    <p style="color:red;">@ViewBag.Error</p>
+                    <p style="color:forestgreen;">@ViewBag.Ok</p>
+                    <table>
+                        <tbody>
+                            <tr><td><input name="fio" type="text" value="@ViewBag.Fio" maxlength="100" class="inputst" placeholder="Фамилия Имя Отчество"></td></tr>
+                            <tr><td><input name="email" type="text" value="@ViewBag.Email" maxlength="100" class="inputst" placeholder="E-mail"></td></tr>
+                            <tr><td><input name="telef" type="text" value="@ViewBag.Telef" maxlength="100" class="inputst" placeholder="Мобильный телефон"></td></tr>
+                            <tr><td colspan="2" style="text-align:center;"><input style="margin-top:10px;text-align: center;cursor: pointer;font-size: 18px;padding: 6px 15px;" class="submitst" type="submit" value="Отправить"></td></tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="right" >
+                <p>За 9 лет мы накопили большой багаж интересных кейсов и с удовольствием беремся за нестандартные проекты.
+                    Мы знаем, как решить любую задачу в области телефонии и автоматизации. </p>
+                <p>ПОПРОБУЙТЕ ТЕЛЕФОНИЮ АКСАТЕЛ БЕСПЛАТНО</p>
+                <p>14 дней бесплатно. После заполнения этой формы мы создадим и настроим Виртуальную АТС. Подробная инструкция с данными для доступа будет отправлена на e-mail.</p>
+                <p>Остались вопросы - звоните: +375 29 1994433</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>
+                &copy; @DateTime.Now.Year - Все права защищены. Powered by AXATA
+            </p>
+        </footer>
+    </div>
+    <style>
+        .inputst {
+            padding: 8px 15px;
+            font-size: 17px;
+            color: #608c8c;
+            max-width: 350px;
+            border-radius: 5px;
+            background-color: #fbfbfb;
+        }
+            .inputst:focus {
+                border: 1px solid #aae2ec;
+                box-shadow: 0px 0px 6px 4px #73858c1c;
+            }
+        .main td {
+            text-align: left;
+            border: none;
+        }
+        .leff {
+            width: 39%;
+            display: inline-block;
+            text-align: center;
+        }
+        .right {
+            width: 60%;
+            display: inline-block;
+            vertical-align: top;
+            background-color: #fbfbfb;
+            margin-top: 10px;
+            padding: 20px;
+            font-size: 16px;
+            color: #2d5759;
+        }
+
+
+      
+    </style>
+
+</body>
+</html>
+
+

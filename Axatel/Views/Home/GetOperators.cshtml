@@ -1,0 +1,36 @@
+﻿@model List<dynamic>
+@{
+    Layout = null;
+
+
+}
+<table style="width: 100%;">
+    <thead>
+        <tr><th>Пользователь</th><th>Внутренний номер</th><th>Мобильный номер</th></tr>
+    </thead>
+    <tbody>
+ @foreach (var item in Model)
+ {
+     foreach (var subitem in item.result)
+     {
+         string numb = subitem.UF_PHONE_INNER;
+         string mobnumb = subitem.PERSONAL_MOBILE;
+         if (string.IsNullOrEmpty(subitem.UF_PHONE_INNER))
+         {
+             numb = "<span style='color:red;'>Нет номера</span>";
+         }
+         if (string.IsNullOrEmpty(subitem.PERSONAL_MOBILE))
+         {
+             mobnumb = "<span style='color:red;'>Нет номера</span>";
+         }
+
+           <tr><td>@subitem.LAST_NAME @subitem.NAME</td><td>@Html.Raw(numb)</td><td>@Html.Raw(mobnumb)</td></tr>
+
+        }
+
+
+    }
+
+    </tbody>
+    </table>
+

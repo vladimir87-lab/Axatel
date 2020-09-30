@@ -1,0 +1,25 @@
+﻿@model string
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="">
+        <div class="navbar-header" style="width: 100%;">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a class="navbar-brand" href="mainpage?member_id=@Model">Axatel</a>
+            <a class="navbar-brand" href="blacklist?member_id=@Model">BlackList</a>
+            <a class="navbar-brand" href="tiket?member_id=@Model">Поддержка</a>
+            @*@if (User.Identity.IsAuthenticated)
+        {
+        <a class="navbar-brand" href="/exit" style="float:right;">Выход</a>
+        }*@
+
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav"></ul>
+        </div>
+    </div>
+</div>

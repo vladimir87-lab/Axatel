@@ -1,0 +1,134 @@
+﻿@using Axatel.Models
+@model Compan
+@{
+    string idmemb = Model.MemberId.ToString();
+    ViewBag.Title = "MainPage";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройка телефонии Axatel</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery-1.11.3.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="//api.bitrix24.com/api/v1/dev/"></script>
+</head>
+<body class="body-content">
+    <script>
+        BX24.init(function () {
+            $(document).ready(function () {
+
+                BX24.installFinish();
+            });
+        });
+
+    </script>
+
+    <div>
+        @Html.Partial("/Views/Shared/header.cshtml", idmemb)
+        <div class="main">
+            <div class="info">
+                <span>Имя портала: <b>@Model.Portal</b></span><br>
+                @if (string.IsNullOrEmpty(Model.AxatelGuid))
+                {
+                    <span>Проблема: <b><span style="color:red">Не указан КЛЮЧ станции</span></b></span><br>
+                }
+                @if (string.IsNullOrEmpty(Model.BackIp))
+                {
+                    <span>Проблема: <b><span style="color:red">Не указан IP адрес станции для ClickToCall</span></b></span><br>
+                }
+                @if (string.IsNullOrEmpty(Model.BackToken))
+                {
+                    <span>Проблема: <b><span style="color:red">Не указан ТОКЕН станции для ClickToCall</span></b></span><br>
+                }
+                @*<span>Активных: <b>1</b></span><br>
+            <span>Неактивных: <b>1</b></span><br>*@
+
+            </div>
+
+            <form action="/mainpage" method="post" enctype="application/x-www-form-urlencoded">
+                <h4>Введите уникальный КЛЮЧ станции Axatel:</h4>
+                <input type="hidden" name="member_id" value="@idmemb">
+                <input class="inputst" type="text" value="@Model.AxatelGuid" name="AXATEL_GUID">
+                <h4>Введите IP адрес станции Axatel для ClickToCall:</h4>
+                <input class="inputst" type="text" value="@Model.BackIp" name="backip">
+                <h4>Введите ТОКЕН станции Axatel для ClickToCall:</h4>
+                <input class="inputst" type="text" value="@Model.BackToken" name="backurl">
+                <h4>Внутренний номер пользователя обратного звонка из CRM-форм:</h4>
+                <input class="inputst" type="text" value="@Model.InerNumb" name="innumb">
+                <div>
+                    <h4>Выберите тип звонка ClickToCall</h4>
+                    @if (Model.Type == "INTERCOM")
+                    {
+                        <label><input type="radio" name="Type" value="INTERCOM" checked> INTERCOM</label>
+                    }
+                    else
+                    {
+                        <label><input type="radio" name="Type" value="INTERCOM"> INTERCOM</label>
+                    }
+                    @if (Model.Type == "CALLBACK")
+                    {
+                        <label><input type="radio" name="Type" value="CALLBACK" checked> CALLBACK</label>
+                    }
+                    else
+                    {
+                        <label><input type="radio" name="Type" value="CALLBACK"> CALLBACK</label>
+                    }
+                </div>
+                @if (ViewBag.Check == "True")
+                {
+                <div><p style="margin: 10px;color: forestgreen;">Успешный импорт настроек!</p></div>
+                } else if (ViewBag.Check == "False")
+                {
+                <div><p style="margin: 10px;color: red;">Настройки станции введены не верно, обратитесь в техническую поддержку!</p></div>
+                }
+                <div> <input type="submit" style="margin-top:10px;" class="submitst" value="Сохранить">  <input style="margin-top:10px;text-align: center;width: 100px;cursor: pointer;" class="submitst" value="Операторы" onclick="opendialog()"></div>
+            </form>
+
+
+        </div>
+
+        <footer>
+            <p>
+                &copy; @DateTime.Now.Year - Все права защищены. Powered by AXATA
+            </p>
+        </footer>
+    </div>
+    <script>
+
+
+        function opendialog() {
+
+            $(".body-content").append("<div class='popup'><div class='popup_bg'></div>" + //Добавляем в тело документа разметку всплывающего окна
+                "<div class='bay-akk-dialog'><div class='close_cros' style='position: absolute; background-image: url(\"/Content/images/close.png\"); width: 32px; height: 32px; top: -2px; right: 0px; cursor: pointer;'></div>" +                             
+                "<div id='tdseloper' style='height: 400px;overflow-y: scroll;'>Загрузка...</div>" +
+                "</div></div>");
+
+            $.ajax({
+                type: "POST",
+                url: "/getoperators",
+                data: { member_id: '@ViewBag.Memb'},
+                success: function (data) {
+                    $('#tdseloper').html(data);
+                }
+            });
+
+            $(".popup").fadeIn(400); // Медленно выводим изображение
+            $(".close_cros").click(function () {    // Событие клика на затемненный фон
+                $(".popup").fadeOut(400);    // Медленно убираем всплывающее окно
+                setTimeout(function () {    // Выставляем таймер
+                    $(".popup").remove(); // Удаляем разметку всплывающего окна
+                }, 400);
+            });
+        };
+
+    </script>
+
+</body>
+</html>
+
+
