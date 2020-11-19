@@ -21,5 +21,6 @@ namespace Axatel.Models
         public int? InerNumb { get; set; }
         public int IdFolder { get; set; }
         public int Activ { get; set; }
+        public int IsScript { get; set; }
     }
 }

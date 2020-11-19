@@ -20,6 +20,7 @@ namespace Axatel.Models
         public DbSet<amoCompan> amoCompans { get; set; }
         public DbSet<amoOperator> amoOperators { get; set; }
         public DbSet<AlfaCompan> alfaCompans { get; set; }
+        public DbSet<Script> Scripts { get; set; }
 
 
 

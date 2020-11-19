@@ -36,13 +36,13 @@ namespace Axatel.Controllers
         public ActionResult Index(string member_id = "")
         {
 
-          // return Content("ok");
+            // return Content("ok");
             return RedirectToAction("MainPage", new { member_id = member_id });
         }
         public ActionResult MainPage(string member_id)
         {
             // if (string.IsNullOrEmpty(member_id)) return Content("<h2>Ошибка доступа<h2>");
-            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();           
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
             if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
             if (comp.Activ == 0)
             {
@@ -66,7 +66,7 @@ namespace Axatel.Controllers
                 return RedirectToAction("Intro", new { member_id = member_id });
             }
             if (!string.IsNullOrEmpty(backurl))
-            {              
+            {
                 comp.BackToken = backurl;
                 comp.BackIp = backip;
                 comp.Type = Type;
@@ -81,9 +81,9 @@ namespace Axatel.Controllers
                 entity = "check",
                 action = "check",
                 options = new
-                {                    
+                {
                     B24_URL = comp.Portal,
-                    AXATEL_GUID = AXATEL_GUID,                  
+                    AXATEL_GUID = AXATEL_GUID,
                 }
             };
             string contentText = JsonConvert.SerializeObject(data).ToString();
@@ -113,7 +113,7 @@ namespace Axatel.Controllers
             return View(comp);
         }
 
-        
+
 
         // регистрация звонка
         public ActionResult Reg(string INTAPP, string AXATEL_GUID, string B24_URL, string PHONE_NUMBER, string CALL_START_DATE, string TYPE, string CRM_CREATE, string PROCES_STATUS, string USER_PHONE_INNER = "0", string LINE_NUMBER = "")
@@ -126,14 +126,14 @@ namespace Axatel.Controllers
             }
             catch
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--RegCall--Ошибка логирования--\n\n");
             }
             myfile.Close();
             myfile.Dispose();
-            
+
             Compan co = _db.Compans.Where(p => p.Portal == B24_URL && p.AxatelGuid == AXATEL_GUID).FirstOrDefault();
             if (co == null) { return Content("Портал не найден"); }
-            if (TYPE =="2")
+            if (TYPE == "2")
             {
                 BlackList bl = _db.BlackLists.Where(i => i.PortalId == co.Id).Where(n => n.Numb == PHONE_NUMBER.Trim()).FirstOrDefault();
                 if (bl != null)
@@ -151,12 +151,12 @@ namespace Axatel.Controllers
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
-            try { 
-            myfile.WriteLine(DateTime.Now.ToString() + "--FinishCall--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--CALL_Guid:" + CALL_Guid + "--INNER_PHONE:" + INNER_PHONE + "--DURATION:" + DURATION + "--VI_STATUS:" + VI_STATUS + "--PROCES_STATUS:" + PROCES_STATUS + "--FAILED_REASON:" + FAILED_REASON + "--VOTE:" + VOTE + "--CALL_FINISH_DATE:"+ CALL_FINISH_DATE+"\n\n");
+            try {
+                myfile.WriteLine(DateTime.Now.ToString() + "--FinishCall--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--CALL_Guid:" + CALL_Guid + "--INNER_PHONE:" + INNER_PHONE + "--DURATION:" + DURATION + "--VI_STATUS:" + VI_STATUS + "--PROCES_STATUS:" + PROCES_STATUS + "--FAILED_REASON:" + FAILED_REASON + "--VOTE:" + VOTE + "--CALL_FINISH_DATE:" + CALL_FINISH_DATE + "\n\n");
             }
             catch
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--FinishCall--Ошибка логирования--\n\n");
             }
             myfile.Close();
             myfile.Dispose();
@@ -168,19 +168,21 @@ namespace Axatel.Controllers
 
 
 
-            return Json(new { result="ok" }, JsonRequestBehavior.AllowGet);
+            return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Record(string INTAPP, string AXATEL_GUID, string CALL_Guid, string B24_URL, string FILE_CONTENT, string URL, string PROCES_STATUS )
+        public ActionResult Record(string INTAPP, string AXATEL_GUID, string CALL_Guid, string B24_URL, string FILE_CONTENT, string URL, string PROCES_STATUS)
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
-            try { 
-            myfile.WriteLine(DateTime.Now.ToString() + "--Record--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--FILE_CONTENT:" + FILE_CONTENT.Substring(0,10) + "--PROCES_STATUS:" + PROCES_STATUS+"--\n\n");
+            string filecont = "";
+            if (FILE_CONTENT.Length > 10) { filecont = FILE_CONTENT.Substring(0, 10); } else { filecont = FILE_CONTENT; };
+            try {
+                myfile.WriteLine(DateTime.Now.ToString() + "--Record--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--FILE_CONTENT:" + filecont + "--PROCES_STATUS:" + PROCES_STATUS + "--URL:" + URL + "--\n\n");
             }
             catch
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--Record--Ошибка логирования--\n\n");
             }
             myfile.Close();
             myfile.Dispose();
@@ -192,18 +194,18 @@ namespace Axatel.Controllers
             func.Record(CALL_Guid, B24_URL, FILE_CONTENT, URL, co.BackIp, co.AcesTok);
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
-        
+
 
         public ActionResult Showgroup(string AXATEL_GUID, string B24_URL, string CALL_GUID, string[] INNER_PHONE)
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
-            try { 
-            myfile.WriteLine(DateTime.Now.ToString() + "--Showgroup--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--CALL_GUID:" + CALL_GUID + "--INNER_PHONE:" + string.Join(",", INNER_PHONE) + "\n\n");
+            try {
+                myfile.WriteLine(DateTime.Now.ToString() + "--Showgroup--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--CALL_GUID:" + CALL_GUID + "--INNER_PHONE:" + string.Join(",", INNER_PHONE) + "\n\n");
             }
             catch
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--Showgroup--Ошибка логирования--\n\n");
             }
             myfile.Close();
             myfile.Dispose();
@@ -220,12 +222,12 @@ namespace Axatel.Controllers
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
-            try { 
-            myfile.WriteLine(DateTime.Now.ToString() + "--Hidegroup--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--CALL_GUID:" + CALL_GUID + "--INNER_PHONE:" + string.Join(",", INNER_PHONE) + "\n\n");
+            try {
+                myfile.WriteLine(DateTime.Now.ToString() + "--Hidegroup--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--CALL_GUID:" + CALL_GUID + "--INNER_PHONE:" + string.Join(",", INNER_PHONE) + "\n\n");
             }
             catch
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--Hidegroup--Ошибка логирования--\n\n");
             }
             myfile.Close();
             myfile.Dispose();
@@ -241,12 +243,12 @@ namespace Axatel.Controllers
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
-            try { 
-            myfile.WriteLine(DateTime.Now.ToString() + "--Transfer--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--CALL_GUID:" + CALL_GUID + "--NUMBER_HIDE:" + string.Join(",", NUMBER_HIDE) + "--NUMBER_SHOW:" + string.Join(",", NUMBER_SHOW) + "\n\n");
+            try {
+                myfile.WriteLine(DateTime.Now.ToString() + "--Transfer--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--CALL_GUID:" + CALL_GUID + "--NUMBER_HIDE:" + string.Join(",", NUMBER_HIDE) + "--NUMBER_SHOW:" + string.Join(",", NUMBER_SHOW) + "\n\n");
             }
             catch
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--Transfer--Ошибка логирования--\n\n");
             }
             myfile.Close();
 
@@ -266,7 +268,7 @@ namespace Axatel.Controllers
             public string domain { get; set; }
             public string application_token { get; set; }
             public string member_id { get; set; }
-        }       
+        }
         public class Data
         {
             public string PHONE_NUMBER { get; set; }
@@ -282,12 +284,12 @@ namespace Axatel.Controllers
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
-            try { 
-            myfile.WriteLine(DateTime.Now.ToString() + "--BackToCall--B24_GUID:" + data.CALL_ID + "--B24_URL:" + auth.domain + "--PHONE_NUMBER:" + data.PHONE_NUMBER + "--CRM_ENTITY_TYPE:" + data.CRM_ENTITY_TYPE + "--CRM_ENTITY_ID:" + data.CRM_ENTITY_ID + "--USER_ID:" + data.USER_ID + "\n\n");
+            try {
+                myfile.WriteLine(DateTime.Now.ToString() + "--BackToCall--B24_GUID:" + data.CALL_ID + "--B24_URL:" + auth.domain + "--PHONE_NUMBER:" + data.PHONE_NUMBER + "--CRM_ENTITY_TYPE:" + data.CRM_ENTITY_TYPE + "--CRM_ENTITY_ID:" + data.CRM_ENTITY_ID + "--USER_ID:" + data.USER_ID + "\n\n");
             }
             catch
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--BackToCall--Ошибка логирования--\n\n");
             }
             myfile.Close();
 
@@ -297,8 +299,8 @@ namespace Axatel.Controllers
             if (co == null) { return Content("Портал не найден"); }
             RefSetToken(auth.domain);
             // string UserInnerNumb = func.GetUserInnerNumb(auth.domain, co.AcesTok, data.USER_ID);
-            
-             var datasend = new
+
+            var datasend = new
             {
                 entity = "callmanager",
                 action = "init_call",
@@ -325,16 +327,16 @@ namespace Axatel.Controllers
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
 
-       public ActionResult ClickToCall(Data data, Auth auth, string ts, string @event)
+        public ActionResult ClickToCall(Data data, Auth auth, string ts, string @event)
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
-            try { 
-            myfile.WriteLine(DateTime.Now.ToString() + "--ClickToCall--B24_GUID:" + data.CALL_ID + "--B24_URL:" + auth.domain + "--PHONE_NUMBER:" + data.PHONE_NUMBER + "--CRM_ENTITY_TYPE:" + data.CRM_ENTITY_TYPE + "--CRM_ENTITY_ID:" + data.CRM_ENTITY_ID + "--USER_ID:" + data.USER_ID + "\n\n");
+            try {
+                myfile.WriteLine(DateTime.Now.ToString() + "--ClickToCall--B24_GUID:" + data.CALL_ID + "--B24_URL:" + auth.domain + "--PHONE_NUMBER:" + data.PHONE_NUMBER + "--CRM_ENTITY_TYPE:" + data.CRM_ENTITY_TYPE + "--CRM_ENTITY_ID:" + data.CRM_ENTITY_ID + "--USER_ID:" + data.USER_ID + "\n\n");
             }
             catch
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--ClickToCall--Ошибка логирования--\n\n");
             }
             myfile.Close();
 
@@ -394,13 +396,13 @@ namespace Axatel.Controllers
                     }
                 };
             }
-                      
+
             string contentText = JsonConvert.SerializeObject(datasend).ToString();
             string content;
             using (xNet.HttpRequest request = new xNet.HttpRequest())
             {
-                content = request.Post("http://"+co.BackIp+"/api/token/v1/"+co.BackToken, contentText, "application/json").ToString();
-               // content = request.Post("https://webhook.site/a1ff4420-166e-42c8-9639-184561dcca43", contentText, "application/json").ToString();
+                content = request.Post("http://" + co.BackIp + "/api/token/v1/" + co.BackToken, contentText, "application/json").ToString();
+                // content = request.Post("https://webhook.site/a1ff4420-166e-42c8-9639-184561dcca43", contentText, "application/json").ToString();
             }
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
 
@@ -429,15 +431,15 @@ namespace Axatel.Controllers
             }
             else
             {
-       
-                    string content;
-                    using (xNet.HttpRequest request = new xNet.HttpRequest())
-                    {
-                        content = request.Get("https://" + DOMAIN + "/rest/event.bind.json?event=OnExternalCallStart&handler=http://service-axatel.ru:8098/clicktocall&auth=" + AUTH_ID).ToString();
-                        System.Threading.Thread.Sleep(100);
-                        content = request.Get("https://" + DOMAIN + "/rest/event.bind.json?event=OnExternalCallBackStart&handler=http://service-axatel.ru:8098/backtocall&auth=" + AUTH_ID).ToString();
 
-                    }
+                string content;
+                using (xNet.HttpRequest request = new xNet.HttpRequest())
+                {
+                    content = request.Get("https://" + DOMAIN + "/rest/event.bind.json?event=OnExternalCallStart&handler=http://service-axatel.ru:8098/clicktocall&auth=" + AUTH_ID).ToString();
+                    System.Threading.Thread.Sleep(100);
+                    content = request.Get("https://" + DOMAIN + "/rest/event.bind.json?event=OnExternalCallBackStart&handler=http://service-axatel.ru:8098/backtocall&auth=" + AUTH_ID).ToString();
+
+                }
 
 
                 Compan comp = new Compan();
@@ -517,6 +519,51 @@ namespace Axatel.Controllers
             return PartialView(listoper);
         }
 
+        public ActionResult RegLead(string AXATEL_GUID, string B24_URL, string PHONE_NUMBER, string LINE_NUMBER, string Lead_name, string INNER_PHONE)
+        {
+            string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
+            System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
+            try
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "--RegLead--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--PHONE_NUMBER:" + PHONE_NUMBER + "--LINE_NUMBER:" + LINE_NUMBER + "--INNER_PHONE:" + INNER_PHONE + "--Lead_name:" + Lead_name + "\n\n");
+            }
+            catch
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+            }
+            myfile.Close();
+            myfile.Dispose();
+            RefSetToken(B24_URL);
+            Compan co = _db.Compans.Where(p => p.Portal == B24_URL && p.AxatelGuid == AXATEL_GUID).FirstOrDefault();
+            if (co == null) { return Content("Портал не найден"); }
+
+            string idlead = func.RegLead(B24_URL, PHONE_NUMBER, Lead_name, co.AcesTok, INNER_PHONE);
+
+            return Json(new { result = "ok", leadid = idlead }, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult RegaCall(string AXATEL_GUID, string B24_URL, string LeadID, string Comment, string INNER_PHONE, string PHONE_NUMBER)
+        {
+            string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
+            System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
+            try
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "--RegaCall--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--LeadID:" + LeadID + "--Comment:" + Comment + "--INNER_PHONE:" + INNER_PHONE + "--PHONE_NUMBER" + PHONE_NUMBER + "\n\n");
+            }
+            catch
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+            }
+            myfile.Close();
+            myfile.Dispose();
+            RefSetToken(B24_URL);
+            Compan co = _db.Compans.Where(p => p.Portal == B24_URL && p.AxatelGuid == AXATEL_GUID).FirstOrDefault();
+            if (co == null) { return Content("Портал не найден"); }
+
+            func.RegaCall(B24_URL, LeadID, Comment, co.AcesTok, INNER_PHONE, PHONE_NUMBER);
+
+            return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
+        }
+
         List<dynamic> SearchDeals(out int count, string member_id)
         {
             List<dynamic> total = new List<dynamic>();
@@ -578,8 +625,8 @@ namespace Axatel.Controllers
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
-            try { 
-            myfile.WriteLine(DateTime.Now.ToString() + "--FaxAtt--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--FILE_CONTENT:" + FILE_CONTENT.Substring(0, 10) + "--PROCES_STATUS:" + PROCES_STATUS + "--\n\n");
+            try {
+                myfile.WriteLine(DateTime.Now.ToString() + "--FaxAtt--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--FILE_CONTENT:" + FILE_CONTENT.Substring(0, 10) + "--PROCES_STATUS:" + PROCES_STATUS + "--\n\n");
             }
             catch
             {
@@ -608,7 +655,7 @@ namespace Axatel.Controllers
                 {
                     content = request.Post("https://" + co.Portal + "/rest/disk.storage.addfolder?auth=" + co.AcesTok, contentText2, "application/json").ToString();
                 }
-                
+
                 dynamic obj = JsonConvert.DeserializeObject<ExpandoObject>(content, converter);
                 int idfold = Convert.ToInt32(obj.result.ID);
                 co.IdFolder = idfold;
@@ -647,14 +694,14 @@ namespace Axatel.Controllers
                 content3 = request.Post("https://" + co.Portal + "/rest/disk.folder.uploadfile?auth=" + co.AcesTok, contentsend3, "application/json").ToString();
             }
             List<int> ids = new List<int>();
-            
+
             string content4;
             using (xNet.HttpRequest request4 = new xNet.HttpRequest())
             {
                 content4 = request4.Get("https://" + co.Portal + "/rest/user.search?auth=" + co.AcesTok).ToString();
             }
             dynamic obj4 = JsonConvert.DeserializeObject<ExpandoObject>(content4, converter);
-            foreach(var item in obj4.result)
+            foreach (var item in obj4.result)
             {
                 ids.Add(Convert.ToInt32(item.ID));
             }
@@ -664,7 +711,7 @@ namespace Axatel.Controllers
                 System.Threading.Thread.Sleep(200);
                 using (xNet.HttpRequest request5 = new xNet.HttpRequest())
                 {
-                    string cont = request5.Get("https://" + co.Portal + "/rest/im.notify.json?to=" + items+ "&message=Вам пришел факс!&auth=" + co.AcesTok).ToString();
+                    string cont = request5.Get("https://" + co.Portal + "/rest/im.notify.json?to=" + items + "&message=Вам пришел факс!&auth=" + co.AcesTok).ToString();
                 }
             }
 
@@ -694,7 +741,7 @@ namespace Axatel.Controllers
             MailMessage message = new MailMessage();
             message.From = new MailAddress("axatel_no_reply@axata.by", "Axatel");
             message.To.Add(new MailAddress(Email.Trim()));
-           
+
             message.IsBodyHtml = true;
             message.SubjectEncoding = System.Text.Encoding.UTF8;
             message.BodyEncoding = System.Text.Encoding.UTF8;
@@ -705,13 +752,13 @@ namespace Axatel.Controllers
                 client.Send(message);
                 return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Json(new { result = "error", desc = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
-       
+
         public ActionResult SmsSend(string AXATEL_GUID, string B24_URL, string PHONE_NUMBER, string SMS_TEXT)
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
@@ -733,7 +780,7 @@ namespace Axatel.Controllers
                 string content;
                 using (xNet.HttpRequest request = new xNet.HttpRequest())
                 {
-                    content = request.Get("https://userarea.sms-assistent.by/api/v1/send_sms/plain?user=Aksata&password=5VFH3a8y&recipient="+ PHONE_NUMBER .Trim()+ "&message="+ SMS_TEXT.Trim() + "&sender=Axata").ToString();
+                    content = request.Get("https://userarea.sms-assistent.by/api/v1/send_sms/plain?user=Aksata&password=5VFH3a8y&recipient=" + PHONE_NUMBER.Trim() + "&message=" + SMS_TEXT.Trim() + "&sender=Axata").ToString();
                 }
                 return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
             }
@@ -791,7 +838,7 @@ namespace Axatel.Controllers
             ViewBag.Memb = member_id;
             return View(blist);
         }
-        public ActionResult AddNumb(string member_id , string numb)
+        public ActionResult AddNumb(string member_id, string numb)
         {
             Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
             if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
@@ -922,12 +969,12 @@ namespace Axatel.Controllers
                 ViewBag.Ok = "Ваше обращение принято!";
                 return View();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ViewBag.Memb = member_id;
                 ViewBag.Error = ex.Message;
                 return View();
-            }         
+            }
         }
         [HttpGet]
         public ActionResult Intro(string member_id)
@@ -971,7 +1018,7 @@ namespace Axatel.Controllers
                 ViewBag.Telef = telef;
                 return View();
             }
-            
+
             Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
             if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
             if (comp.Activ == 1)
@@ -1029,7 +1076,7 @@ namespace Axatel.Controllers
                 ViewBag.Ok = "Ваше обращение принято!";
                 ViewBag.Memb = member_id;
                 return View();
-            }catch (Exception ex)
+            } catch (Exception ex)
             {
                 ViewBag.Memb = member_id;
                 ViewBag.Error = ex.Message;
@@ -1055,7 +1102,7 @@ namespace Axatel.Controllers
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
             try
             {
-                myfile.WriteLine(DateTime.Now.ToString() + "--DealApp--URL:" + URL + "--authorization_token:" + authorization_token + "--started_at:" + started_at + "--operator_id:" + operator_id + "--client_id: " + client_id + "--direction: " + direction + "--duration:" + duration + " --operator_phone_number: " + operator_phone_number + "--client_phone_number: " + client_phone_number +"--audio_source_url: " + audio_source_url + " --\n\n");
+                myfile.WriteLine(DateTime.Now.ToString() + "--DealApp--URL:" + URL + "--authorization_token:" + authorization_token + "--started_at:" + started_at + "--operator_id:" + operator_id + "--client_id: " + client_id + "--direction: " + direction + "--duration:" + duration + " --operator_phone_number: " + operator_phone_number + "--client_phone_number: " + client_phone_number + "--audio_source_url: " + audio_source_url + " --\n\n");
             }
             catch
             {
@@ -1073,9 +1120,9 @@ namespace Axatel.Controllers
                 duration = duration,
                 operator_phone_number = operator_phone_number,
                 client_phone_number = client_phone_number,
-                audio_source_url =  audio_source_url
+                audio_source_url = audio_source_url
             };
-        
+
             string contentText = JsonConvert.SerializeObject(datasend).ToString();
             string content;
             using (xNet.HttpRequest request = new xNet.HttpRequest())
@@ -1113,6 +1160,107 @@ namespace Axatel.Controllers
             myfile.Dispose();
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult Writer(string Id = "", string member_id = "")
+        {
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
+
+            if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
+            if (comp.Activ == 0)
+            {
+                return RedirectToAction("Intro", new { member_id = member_id });
+            }
+
+            if (comp.IsScript == 0)
+            {
+                RefSetToken(comp.Portal);
+                var data = new
+                {
+                    PLACEMENT = "CALL_CARD",
+                    HANDLER = "https://service-axatel.ru:8099/script"
+                };
+                string contentText2 = JsonConvert.SerializeObject(data).ToString();
+                string content;
+
+                using (xNet.HttpRequest request = new xNet.HttpRequest())
+                {
+                    content = request.Post("https://" + comp.Portal + "/rest/placement.bind?auth=" + comp.AcesTok, contentText2, "application/json").ToString();
+                }
+                comp.IsScript = 1;
+            }
+            List<Script> sc = _db.Scripts.Where(i => i.IdPortal == comp.Id).OrderBy(i => i.Title).ToList();
+            if (Id != "")
+            {
+                ViewBag.Text = sc.Where(i => i.Id.ToString() == Id).FirstOrDefault().Text;
+                ViewBag.Title = sc.Where(i => i.Id.ToString() == Id).FirstOrDefault().Title;
+                ViewBag.Id = sc.Where(i => i.Id.ToString() == Id).FirstOrDefault().Id;
+            }
+
+            return View(sc);
+        }
+        // страница скрипта
+        public ActionResult Script(string member_id)
+        {
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
+
+
+            if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
+            if (comp.Activ == 0)
+            {
+                return RedirectToAction("Intro", new { member_id = member_id });
+            }
+
+            return View();
+        }
+
+
+        // удаляем скрипт
+        public ActionResult DellScript(string Id, string member_id)
+        {
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
+            if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
+            if (comp.Activ == 0)
+            {
+                return RedirectToAction("Intro", new { member_id = member_id });
+            }
+            Script script = _db.Scripts.Where(i => i.Id.ToString() == Id).FirstOrDefault();
+            _db.Entry(script).State = System.Data.Entity.EntityState.Deleted;
+            _db.SaveChanges();
+            return Content("ok");
+
+        }
+        [ValidateInput(false)]
+        public ActionResult AddScript( string Text, string Title, string member_id, string Id)
+        {
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
+
+            if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
+            if (comp.Activ == 0)
+            {
+                return RedirectToAction("Intro", new { member_id = member_id });
+            }
+            if (Id != "")
+            {
+                Script script = _db.Scripts.Where(i => i.Id.ToString() == Id).FirstOrDefault();
+                script.Text = Text;
+                script.Title = Title;
+                _db.Entry(script).State = System.Data.Entity.EntityState.Modified;
+                _db.SaveChanges();
+                return RedirectToAction("Writer", new { Id = script.Id, member_id = member_id });
+            }
+            else
+            {
+                Script nscript = new Script();
+                nscript.Text = Text;
+                nscript.Title = Title;
+                nscript.IdPortal = comp.Id;
+
+                _db.Scripts.Add(nscript);
+                _db.SaveChanges();
+                return RedirectToAction("Writer", new { Id = nscript.Id, member_id = member_id });
+            }
+        }
+        
 
 
 

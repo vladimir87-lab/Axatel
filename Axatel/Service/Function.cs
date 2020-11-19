@@ -125,7 +125,7 @@ namespace Axatel.Service
             }                       
             return operb24;
         }
-
+        //получаем ид оператора битрикс24
         public string GetIdUserB24(string B24_URL, string actok, string USER_PHONE_INNER)
         {
             string operb24 = "1";
@@ -215,11 +215,23 @@ namespace Axatel.Service
             }
             
             string contentText = JsonConvert.SerializeObject(data).ToString();
+            string content = "";
             using (xNet.HttpRequest request = new xNet.HttpRequest())
             {
-                string content = request.Post("https://" + B24_URL + "/rest/telephony.externalcall.finish.json?auth=" + actok, contentText, "application/json").ToString();
+                content = request.Post("https://" + B24_URL + "/rest/telephony.externalcall.finish.json?auth=" + actok, contentText, "application/json").ToString();
             }
-
+            string pach = System.Web.Hosting.HostingEnvironment.MapPath("/logb24.txt");
+            System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
+            try
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "--FinishCallB24--Content: " + content + "--\n\n");
+            }
+            catch
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "--FinishCallB24--Ошибка логирования!--\n\n");
+            }
+            myfile.Close();
+            myfile.Dispose();
             return 1;
         }
 
@@ -241,6 +253,82 @@ namespace Axatel.Service
 
             return 1;
         }
+
+        public string RegLead(string B24_URL, string PHONE_NUMBER, string NameLead, string actok, string USER_PHONE_INNER)
+        {
+            string operb24 = GetIdUserB24(B24_URL, actok, USER_PHONE_INNER);
+            var data = new
+            {
+
+                fields = new
+                {
+                    TITLE = NameLead,
+                    NAME = "Имя лида "+ PHONE_NUMBER,
+                    SECOND_NAME = "",
+                    LAST_NAME = "",
+                    STATUS_ID = "NEW",
+                    OPENED = "Y",
+                    ASSIGNED_BY_ID = operb24,
+                    CURRENCY_ID = "BYN",
+
+                    PHONE = new[]
+                    {
+                         new {VALUE=PHONE_NUMBER , VALUE_TYPE = "WORK"}
+                    }
+
+                },
+                @params = new
+                {
+                    REGISTER_SONET_EVENT = "Y"
+                }
+
+            };
+            string contentText = JsonConvert.SerializeObject(data).ToString();
+
+            string content;
+            using (xNet.HttpRequest request = new xNet.HttpRequest())
+            {
+                content = request.Post("https://" + B24_URL + "/rest/crm.lead.add?auth=" + actok, contentText, "application/json").ToString();
+            }
+            var converter2 = new ExpandoObjectConverter();
+            dynamic idlead = JsonConvert.DeserializeObject<System.Dynamic.ExpandoObject>(content, converter2);
+            return idlead.result.ToString();
+        }
+
+        public string  RegaCall(string B24_URL, string LeadID, string Comment, string actok, string USER_PHONE_INNER, string PHONE_NUMBER)
+        {
+           // string operb24 = GetIdUserB24(B24_URL, actok, USER_PHONE_INNER);
+            var data = new
+            {
+
+                fields = new
+                {
+                    OWNER_TYPE_ID = 1,
+                    OWNER_ID = LeadID,
+                    TYPE_ID = 2,
+                    COMMUNICATIONS = new[]
+                    {
+                       new{ VALUE = PHONE_NUMBER }
+                    },
+                    SUBJECT= "Новое дело",
+                    COMPLETED = "N",
+                    RESPONSIBLE_ID ="1",
+                    DESCRIPTION = Comment
+
+                }
+
+            };
+            string contentText = JsonConvert.SerializeObject(data).ToString();
+
+            string content;
+            using (xNet.HttpRequest request = new xNet.HttpRequest())
+            {
+                content = request.Post("https://" + B24_URL + "/rest/crm.activity.add?auth=" + actok, contentText, "application/json").ToString();
+            }
+
+            return "ok";
+        }
+
 
         // регистрация звонка
         public Ansver RegisterCall(string B24_URL, string PHONE_NUMBER, string CALL_START_DATE, string TYPE, string CRM_CREATE, string PROCES_STATUS, string actok, string USER_PHONE_INNER = "0", string LINE_NUMBER="")

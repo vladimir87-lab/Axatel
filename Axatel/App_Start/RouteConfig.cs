@@ -127,6 +127,19 @@ namespace Axatel
             defaults: new { controller = "Home", action = "FaxAtt" }
             );
             routes.MapRoute(
+            name: "RegLead",
+            url: "method/reglead",
+            defaults: new { controller = "Home", action = "RegLead" }
+            );
+            routes.MapRoute(
+            name: "RegaCall",
+            url: "method/regacall",
+            defaults: new { controller = "Home", action = "RegaCall" }
+            );
+            
+
+
+            routes.MapRoute(
              name: "EmailSend",
              url: "method/emailsend",
              defaults: new { controller = "Home", action = "EmailSend" }
@@ -260,11 +273,29 @@ namespace Axatel
 
 
 
-
-
-
-
-
+            routes.MapRoute(
+            name: "Script",
+            url: "script",
+            defaults: new { controller = "Home", action = "Script" }
+            );
+             
+            routes.MapRoute(
+            name: "DellScript",
+            url: "dellscript",
+            defaults: new { controller = "Home", action = "DellScript" }
+            );
+            
+            routes.MapRoute(
+            name: "Writer",
+            url: "writer",
+            defaults: new { controller = "Home", action = "Writer" }
+            );
+            routes.MapRoute(
+            name: "AddScript",
+            url: "addscript",
+            defaults: new { controller = "Home", action = "AddScript" }
+            );
+            
             routes.MapRoute(
             name: "MainPage",
             url: "mainpage",

@@ -1,0 +1,165 @@
+﻿@using Axatel.Models
+@model List<Script>
+@{
+    //string idmemb = ViewBag.Memb;
+    string idmemb = "b79fbc76a13b2e349c2b64435c6c3bd6";
+    
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скрипты телефонии Axatel</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery-1.11.3.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/Content/cre/jquery.cleditor.css" />
+    <script src="/Content/cre/jquery.min.js"></script>
+    <script src="/Content/cre/jquery.cleditor.min.js"></script>
+    <script>
+        $(document).ready(function () { $("#input").cleditor(); });
+    </script>
+
+</head>
+<body class="body-content">
+
+
+    <div>
+        @Html.Partial("/Views/Shared/header.cshtml", idmemb)
+        <div class="main" style="max-width: 1300px;">
+            <div class="info">
+                <h4 style="text-align: center;">Скрипты телефонии Axatel</h4>
+            </div>
+            <div class="leff">
+                <div style="border: 1px solid #e8e8e8;padding: 5px;border-radius: 2px;">
+                    <div class="newscript"><a href="/writer?member_id=@idmemb" class="submitst" style="color: #f2f2f2 !important;">Новый</a></div>
+                    @foreach (var item in Model)
+                    {
+                        <div class="selscript"><a href="/writer?Id=@item.Id&member_id=@idmemb">@item.Title</a><span onclick="Dell('@item.Id')" style="float: right;cursor: pointer;"><img src="/Content/images/cros.png"></span></div>
+                    }
+
+                </div>
+            </div>
+            <div class="right">
+                <form action="/addscript" method="post" enctype="application/x-www-form-urlencoded">
+                    <input type="hidden" name="member_id" value="@idmemb">
+                    <input type="hidden" name="Id" value="@ViewBag.Id">
+                    @if (!string.IsNullOrEmpty(ViewBag.Title))
+                    {
+                        <input class="inputst" value="@ViewBag.Title" style="margin-bottom: 10px;" type="text" name="Title" width="300" placeholder="Название скрипта">
+                    }
+                    else
+                    {
+                        <input class="inputst" value="Новый скрипт" style="margin-bottom: 10px;" type="text" name="Title" width="300" placeholder="Название скрипта">
+                    }
+
+                    <textarea id="input" name="Text">@ViewBag.Text</textarea>
+                    <input type="submit" class="submitst" style="color: #f2f2f2 !important;margin-top: 10px;" value="Сохранить">
+                </form>
+            </div>
+        </div>
+
+        <footer>
+            <p>
+                &copy; @DateTime.Now.Year - Все права защищены. Powered by AXATA
+            </p>
+        </footer>
+    </div>
+    <style>
+        .right {
+            display: inline-block;
+            width: 1090px;
+            vertical-align: top;
+        }
+        .leff {
+            width: 200px;
+            display: inline-block;
+        }
+        .selscript {
+            border-top: 1px solid #e8e8e8;
+            padding: 6px;
+        }
+
+        .bay-akk-dialog {
+            width: 400px !important;
+        }
+        .newscript {
+            text-align: center;
+            padding: 5px 5px 10px 5px;
+        }
+    </style>
+    <script>
+
+        function Dell(id) {
+            if (confirm('Удалить скрипт?'))
+            {
+
+            $.ajax({
+                type: "POST",
+                url: "/dellscript",
+                data: { id: id, member_id: '@idmemb'  },
+                success: function (data) {
+                    if (data == "ok") {
+                        window.location.replace('/writer?member_id=' + '@idmemb');
+                    }
+                }
+            });
+            }else{
+                return;
+            }
+        }
+
+        function opendialog() {
+
+            $(".body-content").append("<div class='popup'><div class='popup_bg'></div>" + //Добавляем в тело документа разметку всплывающего окна
+                "<div class='bay-akk-dialog'><div class='close_cros' style='position: absolute; background-image: url(\"/Content/images/close.png\"); width: 32px; height: 32px; top: -2px; right: 0px; cursor: pointer;'></div>" +
+                "<div><h3>Номер телефона</h3></div>" +
+                "<div><input id='addnumb' onkeypress='checkNumber' type='text' value='' class='inputst'></div>" +
+                "<div><input style='margin-top:10px; text-align:center; width:100px; cursor:pointer;' class='submitst' value='Добавить' onclick='addnumb()'></div>" +
+                "</div></div>");
+
+            $(".popup").fadeIn(400); // Медленно выводим изображение
+            function checkNumber(e) {
+                e = e || window.event;
+                if (e.ctrlKey || e.altKey) return;
+                var c = e.charCode || e.keyCode;
+                if (e.charCode == 0 && (e.keyCode == 8 || e.keyCode == 35 || e.keyCode == 36 || e.keyCode == 37 || e.keyCode == 39)) return;
+                return ((c > 47) && (c < 58) || c == 43);
+            };
+            document.getElementById('addnumb').onkeypress = checkNumber;
+            $(".close_cros").click(function () {    // Событие клика на затемненный фон
+                $(".popup").fadeOut(400);    // Медленно убираем всплывающее окно
+                setTimeout(function () {    // Выставляем таймер
+                    $(".popup").remove(); // Удаляем разметку всплывающего окна
+                }, 400);
+            });
+        };
+
+        function addnumb() {
+            var numb = $('#addnumb').val();
+            $.ajax({
+                type: "POST",
+                url: "/addnumb",
+                data: { numb: numb, member_id: '@idmemb'  },
+                success: function (data) {
+                    if (data == "ok") {
+                        $(".popup").fadeOut(400);    // Медленно убираем всплывающее окно
+                        setTimeout(function () {    // Выставляем таймер
+                            $(".popup").remove(); // Удаляем разметку всплывающего окна
+                        }, 400);
+                        window.location.replace('/blacklist?member_id=' + '@idmemb');
+                    }
+                }
+            });
+        }
+
+
+    </script>
+
+</body>
+</html>
+
+

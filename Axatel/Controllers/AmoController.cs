@@ -190,8 +190,20 @@ namespace Axatel.Controllers
             //  Response.Headers.Add("Access-Control-Allow-Origin", "https://service-axatel.ru");
             return View();
         }
-        public ActionResult Reg(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID, int DURATION, int VI_STATUS, string TYPE, string CALL_FINISH_DATE, int USER_PHONE_INNER = 0, string URL = "")
+        public ActionResult Reg(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID, int VI_STATUS, string TYPE, string CALL_FINISH_DATE="", int? DURATION= 0, int USER_PHONE_INNER = 0, string URL = "")
         {
+            string pach = System.Web.Hosting.HostingEnvironment.MapPath("/logamo.txt");
+            System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
+            try
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "--RegCall--AMO_URL:" + AMO_URL + "--PHONE_NUMBER:" + PHONE_NUMBER + "--VI_STATUS:" + VI_STATUS + "--USER_PHONE_INNER: " + USER_PHONE_INNER + "--DURATION:" + DURATION + "--CALL_FINISH_DATE:" + CALL_FINISH_DATE + "--\n\n");
+            }
+            catch
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "Ошибка логирования--\n\n");
+            }
+            myfile.Close();
+            myfile.Dispose();
             // portal = "officenewbrowsergamesru.amocrm.ru";
             // telefon = "45634565465";
             // userid = "6021190";
@@ -226,12 +238,12 @@ namespace Axatel.Controllers
             {
                 func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv);
             }
-
+             
             //  if (co == null) { return Content("Портал не найден"); }
 
             //func.ShowEvent(co.PortalName, co.AcesTok, telefon, userid);
             URL = "http://" + co.BackIp + URL;
-            func.RegisterCall(co.PortalName, co.AcesTok, PHONE_NUMBER, otv, DURATION, VI_STATUS, TYPE, URL, CALL_FINISH_DATE);
+            func.RegisterCall(co.PortalName, co.AcesTok, PHONE_NUMBER, otv,  VI_STATUS, TYPE, URL, CALL_FINISH_DATE, DURATION);
 
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
@@ -279,7 +291,7 @@ namespace Axatel.Controllers
             amoCompan co = _db.amoCompans.Where(p => p.PortalName == AMO_URL).Where(a => a.AxatelGuid == AXATEL_GUID).FirstOrDefault();
             if (co == null) { return Content("Портал не найден"); }
 
-            string otv = func.GetUsers(co.PortalName, co.AcesTok);
+            string otv = func.GetUsers(co.PortalName, co.AcesTok); // получаем ид любого админа
             string[] datauser = new string[3];
             string[] have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER);
             if (have == null)

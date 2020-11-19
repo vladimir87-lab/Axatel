@@ -169,6 +169,7 @@
     <Compile Include="Models\BlackList.cs" />
     <Compile Include="Models\Compan.cs" />
     <Compile Include="Models\Contex.cs" />
+    <Compile Include="Models\Script.cs" />
     <Compile Include="Models\Tiket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\AlfacrmFunction.cs" />
@@ -222,6 +223,8 @@
     <Content Include="Views\Home\Tiket.cshtml" />
     <Content Include="Views\Home\Intro.cshtml" />
     <Content Include="Views\Amo\Index.cshtml" />
+    <Content Include="Views\Home\Writer.cshtml" />
+    <Content Include="Views\Home\Script.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

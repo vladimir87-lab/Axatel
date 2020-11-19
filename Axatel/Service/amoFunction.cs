@@ -14,8 +14,9 @@ namespace Axatel.Service
         public static string ClientSecret = "RVQISkEGZm5vGN2w8i0Jfjhdux1O7cvHwHGc9nA2me5KkYPSUOZtwEVFKKCwSSI8";
         public static string RedirectUrl = "https://service-axatel.ru:8099/amo/index";
 
-        public void RegisterCall(string portal, string acectok, string tel, string userid, int duration, int status, string type, string link , string CALL_FINISH_DATE)
+        public void RegisterCall(string portal, string acectok, string tel, string userid, int status, string type, string link , string CALL_FINISH_DATE="", int? duration=0)
         {
+            if (status == 6) { duration = 0; CALL_FINISH_DATE = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");  }
             string result = "";
             if (status == 4) { result = "Звонок cостоялся"; }
             else if (status == 6) { result = "Пропущеный"; }
@@ -97,7 +98,7 @@ namespace Axatel.Service
 
                 dynamic obj2 = JsonConvert.DeserializeObject<ExpandoObject>(respc, converter);
                 string[] iduser = new string[2];
-                iduser[0] = obj2._embedded.items[0].created_by.ToString(); // ответственный
+                iduser[0] = obj2._embedded.items[0].responsible_user_id.ToString(); // ответственный
                 iduser[1] = obj2._embedded.items[0].name.ToString(); // имя контакта
                 return iduser;
             }
