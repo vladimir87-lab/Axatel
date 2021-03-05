@@ -1,8 +1,8 @@
 ﻿@using Axatel.Models
 @model List<Script>
 @{
-    //string idmemb = ViewBag.Memb;
-    string idmemb = "b79fbc76a13b2e349c2b64435c6c3bd6";
+    string idmemb = ViewBag.Memb;
+   // string idmemb = "b79fbc76a13b2e349c2b64435c6c3bd6";
     
 }
 
@@ -16,12 +16,14 @@
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <script src="/Scripts/jquery-1.11.3.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="/Content/cre/jquery.cleditor.css" />
-    <script src="/Content/cre/jquery.min.js"></script>
-    <script src="/Content/cre/jquery.cleditor.min.js"></script>
-    <script>
+    @*<link rel="stylesheet" href="/Content/cre/jquery.cleditor.css" />
+    <script src="/Content/cre/jquery.cleditor.js"></script>
+    <script src="/Content/cre/jquery.cleditor.min.js"></script>*@
+    @*<script>
         $(document).ready(function () { $("#input").cleditor(); });
-    </script>
+    </script>*@
+
+    <script src="https://cdn.ckeditor.com/4.15.1/standard-all/ckeditor.js"></script>
 
 </head>
 <body class="body-content">
@@ -33,6 +35,7 @@
             <div class="info">
                 <h4 style="text-align: center;">Скрипты телефонии Axatel</h4>
             </div>
+            <div style="text-align:center;">@Html.Raw(ViewBag.Error)</div>
             <div class="leff">
                 <div style="border: 1px solid #e8e8e8;padding: 5px;border-radius: 2px;">
                     <div class="newscript"><a href="/writer?member_id=@idmemb" class="submitst" style="color: #f2f2f2 !important;">Новый</a></div>
@@ -44,19 +47,39 @@
                 </div>
             </div>
             <div class="right">
-                <form action="/addscript" method="post" enctype="application/x-www-form-urlencoded">
+                <form action="/addscript" method="post" enctype="application/x-www-form-urlencoded" style="height: 600px;">
                     <input type="hidden" name="member_id" value="@idmemb">
                     <input type="hidden" name="Id" value="@ViewBag.Id">
-                    @if (!string.IsNullOrEmpty(ViewBag.Title))
-                    {
-                        <input class="inputst" value="@ViewBag.Title" style="margin-bottom: 10px;" type="text" name="Title" width="300" placeholder="Название скрипта">
-                    }
-                    else
-                    {
-                        <input class="inputst" value="Новый скрипт" style="margin-bottom: 10px;" type="text" name="Title" width="300" placeholder="Название скрипта">
-                    }
+                    <div>
+                        @if (!string.IsNullOrEmpty(ViewBag.Title))
+                        {
+                            <input maxlength="100" class="inputst" value="@ViewBag.Title" style="margin-bottom: 10px;" type="text" name="Title" width="300" placeholder="Название скрипта">
+                        }
+                        else
+                        {
+                            <input maxlength="100" class="inputst" value="Новый скрипт" style="margin-bottom: 10px;" type="text" name="Title" width="300" placeholder="Название скрипта">
+                        }
+                        @if (ViewBag.IsOnscript == 1)
+                        {
+                            <span><a style="color: #f2f2f2 !important;background: #ca0505;border: 1px solid #8c0202;float: right;" class="submitst" href="/onscript?member_id=@idmemb">Отключить</a></span>
+                        }
+                        else if (ViewBag.IsOnscript == 0)
+                        {
+                            <span><a style="color: #f2f2f2 !important;float: right;" class="submitst" href="/onscript?member_id=@idmemb">Включить</a></span>
+                        }
+                    </div>
 
-                    <textarea id="input" name="Text">@ViewBag.Text</textarea>
+                    @*<textarea id="input" name="Text">@ViewBag.Text</textarea>*@
+                    <textarea cols="10" id="Text" name="Text" rows="80" data-sample-short>@ViewBag.Text</textarea>
+                    <script>
+                        var idport = '@ViewBag.IdPortal';
+                        CKEDITOR.replace('Text', {
+                            extraPlugins: 'editorplaceholder',
+                            filebrowserUploadUrl: '/Content/addscript/' + idport,
+                            editorplaceholder: 'Start typing here...'
+                        });
+                       
+                    </script>
                     <input type="submit" class="submitst" style="color: #f2f2f2 !important;margin-top: 10px;" value="Сохранить">
                 </form>
             </div>
@@ -73,6 +96,7 @@
             display: inline-block;
             width: 1090px;
             vertical-align: top;
+            height:600px;
         }
         .leff {
             width: 200px;

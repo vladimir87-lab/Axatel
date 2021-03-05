@@ -1,0 +1,12 @@
+﻿@model List<Axatel.Controllers.ParsContController.Lead>
+@{
+
+}
+
+@foreach (var item in Model)
+{
+    <input type="checkbox" checked id="lead-@item.Id"><label for="lead-@item.Id">@item.Id  @item.Title  @item.Telef</label>
+}
+
+
+

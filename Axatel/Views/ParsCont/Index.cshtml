@@ -1,0 +1,925 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    string idmemb = ViewBag.memberid;
+    DateTime now = DateTime.Now;
+    DateTime startDate = new DateTime(now.Year, now.Month, 1);
+    DateTime endDate = startDate.AddMonths(1).AddDays(-1);
+
+    
+}
+<html lang="ru">
+<head>
+    <meta http-equiv="content-language" content="ru">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <title>Таблица абонентов</title>
+    <!-- Custom styles for this template -->
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery-1.11.3.min.js"></script>
+
+</head>
+<body>
+    <div class="body-content">
+        @Html.Partial("/Views/Shared/header.cshtml", idmemb)
+        <div class="main" style="max-width: 1300px;">
+            <div class="info">
+                <h4 style="text-align: center;">Таблица абонентов Axatel</h4>
+            </div>
+            <div class="user-tab-meny" style="width: 100%;">
+                <ul>
+                    <li id="li1" class="item-ustabnemy activ-item-us">
+                        Лиды
+                    </li>
+                    <li id="li2" class="item-ustabnemy">
+                        Контакты
+                    </li>
+                    <li id="li3" class="item-ustabnemy">
+                        Сделки
+                    </li>
+                    <li id="li4" class="item-ustabnemy">
+                        Компании
+                    </li>
+                    <li id="li5" class="item-ustabnemy" style="float: right;position: relative;">
+                        Настройки
+                    </li>
+                </ul>
+            </div>
+            <div class="user-prof-cont">
+                <div id="user-li1" class="user-all-info" style="display:block;">
+                    <div class="filter">
+
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox1" onclick="showCheckboxes(event,'checkboxes1')">
+                                <select id="selcheck1" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По стадии</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes1" style="padding-top: 10px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check1" onchange="checkall(1)" /><label class="check1" for="check1"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.StatusLid)
+                                {
+                                    <input class="checkall1" type="checkbox" checked name="kontname" value="@item.Key" id="sta-@item.Key" /><label class="check1" for="sta-@item.Key"><span>@item.Value</span></label>
+                                }
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="filt-opis">По дате создания</div>
+                            <div class="datelead">
+                                <input type="date" name="date1-ot" value="@startDate.ToString("yyyy-MM-dd")" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                <input type="date" name="date1-do" value="@endDate.ToString("yyyy-MM-dd")" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox2" onclick="showCheckboxes(event,'checkboxes2')">
+                                <select id="selcheck2" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По ответсвенному</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes2" style="padding-top: 10px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check2" onchange="checkall(2)" /><label class="check2" for="check2"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.Meneg)
+                                {
+                                    <input class="checkall2" type="checkbox" checked name="kontname" value="@item.Key" id="men-@item.Key" /><label class="check2" for="men-@item.Key"><span>@item.Value</span></label>
+                                }
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox3" onclick="showCheckboxes(event,'checkboxes3')">
+                                <select id="selcheck3" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По источнику</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes3" style="padding-top: 10px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check3" onchange="checkall(3)" /><label class="check3" for="check3"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.SOURCELid)
+                                {
+                                    <input class="checkall3" type="checkbox" name="kontname" checked value="@item.Key" id="ist-@item.Key" /><label class="check3" for="ist-@item.Key"><span>@item.Value</span></label>
+                                }
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <button name=" searchlid" onclick="searchlead()">Поиск</button>
+                        </div>
+                    </div>
+                    <div class="datares1">
+                        <div style="padding-top: 20px;height: 450px;overflow-y: scroll;" id="datareslead">
+                        </div>
+                        <div style="padding: 15px;">Всего лидов: <b><span id="totalreslead"> </span></b></div>
+                        <button name="searchlid" style="margin: 15px;display:none;" onclick="Addleads()">Добавить</button><span id="suclead" style="color: green;"></span>
+                    </div>
+                </div>
+                <div id="user-li2" class="user-all-info">
+                    <div class="filter">
+
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox4" onclick="showCheckboxes(event,'checkboxes4')">
+                                <select id="selcheck4" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По типу контакта</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes4" style="padding-top: 10px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check4" onchange="checkall(4)" /><label class="check4" for="check4"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.TypeCont)
+                                {
+                                    <input class="checkall4" type="checkbox" checked name="kontname" value="@item.Key" id="typco-@item.Key" /><label class="check4" for="typco-@item.Key"><span>@item.Value</span></label>
+                                }
+                                <input class="checkall4" type="checkbox" checked name="kontname" value="" id="typco-null" /><label class="check4" for="typco-null"><span>Не определено</span></label>
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="filt-opis">По дате создания</div>
+                            <div class="datelead">
+                                <input type="date" name="date2-ot" value="@startDate.ToString("yyyy-MM-dd")" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                <input type="date" name="date2-do" value="@endDate.ToString("yyyy-MM-dd")" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox5" onclick="showCheckboxes(event,'checkboxes5')">
+                                <select id="selcheck5" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По ответсвенному</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes5" style="padding-top: 10px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check5" onchange="checkall(5)" /><label class="check5" for="check5"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.Meneg)
+                                {
+                                    <input class="checkall5" type="checkbox" checked name="kontname" value="@item.Key" id="otv5-@item.Key" /><label class="check5" for="otv5-@item.Key"><span>@item.Value</span></label>
+                                }
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <button name=" searchlid" onclick="searchcont()">Поиск</button>
+                        </div>
+                    </div>
+                    <div class="datares2">
+                        <div style="padding-top: 20px;height: 450px;overflow-y: scroll;" id="datarescont">
+                        </div>
+                        <div style="padding: 15px;">Всего контактов: <b><span id="totalrescont"> </span></b></div>
+                        <button name="searchlid" style="margin: 15px;display:none;" onclick="addconts()">Добавить</button><span id="succont" style="color: green;"></span>
+                    </div>
+                </div>
+                <div id="user-li3" class="user-all-info">
+                    <div class="filter">
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox6" onclick="showCheckboxes(event,'checkboxes6')">
+                                <select id="selcheck6" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По стадии</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes6" style="padding-top: 10px;width: 300px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check6" onchange="checkall(6)" /><label class="check6" for="check6"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.StadeDeal)
+                                {
+                                    <input class="checkall6" type="checkbox" name="kontname" checked value="@item.Key" id="stdeal-@item.Key" /><label class="check6" for="stdeal-@item.Key"><span>@item.Value</span></label>
+                                }
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="filt-opis">По дате создания</div>
+                            <div class="datelead">
+                                <input type="date" name="date3-ot" value="@startDate.ToString("yyyy-MM-dd")" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                <input type="date" name="date3-do" value="@endDate.ToString("yyyy-MM-dd")" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox7" onclick="showCheckboxes(event,'checkboxes7')">
+                                <select id="selcheck7" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По ответсвенному</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes7" style="padding-top: 10px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check7" onchange="checkall(7)" /><label class="check7" for="check7"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.Meneg)
+                                {
+                                    <input class="checkall7" type="checkbox" checked name="kontname" value="@item.Key" id="otv7-@item.Key" /><label class="check7" for="otv7-@item.Key"><span>@item.Value</span></label>
+                                }
+                            </div>
+                        </div>
+
+
+
+                        <div class="filtblck">
+                            <button name=" searchlid" onclick="searchdeal()">Поиск</button>
+                            <span style="display:none;" id="obrabot">В обработке <b><span id="progres"></span></b> записей</span>
+                        </div>
+                    </div>
+                    <div class="datares3">
+                        <div style="padding-top: 20px;height: 450px;overflow-y: scroll;" id="dataresdeal">
+                        </div>
+                        <div style="padding: 15px;">Всего сделок: <b><span id="totalresdeal"> </span></b></div>
+                        <button name="searchlid" style="margin: 15px;display:none;" onclick="adddeals()">Добавить</button><span id="sucdeal" style="color: green;"></span>
+                    </div>
+                </div>
+                <div id="user-li4" class="user-all-info">
+                    <div class="filter">
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox8" onclick="showCheckboxes(event,'checkboxes8')">
+                                <select id="selcheck8" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По типу компании</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes8" style="padding-top: 10px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check8" onchange="checkall(8)" /><label class="check8" for="check8"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.TypeComp)
+                                {
+                                    <input class="checkall8" type="checkbox" checked name="kontname" value="@item.Key" id="tyco-@item.Key" /><label class="check8" for="tyco-@item.Key"><span>@item.Value</span></label>
+                                }
+                                <input class="checkall8" type="checkbox" checked name="kontname" value="" id="tyco-null" /><label class="check8" for="tyco-null"><span>Не определено</span></label>
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="filt-opis">По дате создания</div>
+                            <div class="datelead">
+                                <input type="date" name="date4-ot" value="@startDate.ToString("yyyy-MM-dd")" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                <input type="date" name="date4-do" value="@endDate.ToString("yyyy-MM-dd")" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <div class="selectBox" id="showlistcheckbox9" onclick="showCheckboxes(event,'checkboxes9')">
+                                <select id="selcheck9" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                    <option>По ответсвенному</option>
+                                </select>
+                                <div class="overSelect"></div>
+                            </div>
+                            <div class="block-checkbox" id="checkboxes9" style="padding-top: 10px;">
+                                <input type="checkbox" checked name="kontname" value="0" id="check9" onchange="checkall(9)" /><label class="check9" for="check9"><span>Выбрать всех</span></label>
+                                @foreach (var item in ViewBag.Meneg)
+                                {
+                                    <input class="checkall9" type="checkbox" checked name="kontname" value="@item.Key" id="otv9-@item.Key" /><label class="check9" for="otv9-@item.Key"><span>@item.Value</span></label>
+                                }
+                            </div>
+                        </div>
+                        <div class="filtblck">
+                            <button name=" searchlid" onclick="searchcomp()">Поиск</button>
+                        </div>
+                    </div>
+                    <div class="datares4">
+                        <div style="padding-top: 20px;height: 450px;overflow-y: scroll;" id="datarescomp">
+                        </div>
+                        <div style="padding: 15px;">Всего сделок: <b><span id="totalrescomp"> </span></b></div>
+                        <button name="searchlid" style="margin: 15px;display:none;" onclick="addcomps()">Добавить</button><span id="succomp" style="color: green;"></span>
+                    </div>
+                </div>
+                <div id="user-li5" class="user-all-info">                  
+                    <div class="datares5">                       
+                        <div style="padding-top: 20px;height: 450px;overflow-y: scroll;">
+                            <h4 style="text-align: center;">Настройки сервиса</h4>
+                            <div style="padding: 5px 5px 5px 20px;">
+                                <span>1. Включение и отключение выдачи номеров</span>
+                                @if (ViewBag.IsWork == 1)
+                                {
+                                    <span><button style="padding: 1px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none;background: #ca0505;border: 1px solid #8c0202;" class="submitst" onclick="sendconfig('work')" id="work">Отключить</button></span>
+                                }
+                                else if (ViewBag.IsWork == 0)
+                                {
+                                    <span><button style="padding: 1px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none;" onclick="sendconfig('work')" id="work">Включить</button></span>
+                                }
+                            </div>
+                            <div style="padding: 5px 5px 5px 20px;">
+                                <span>2. Включение и отключение фитра обработки телефонных номеров</span>
+                                @if (ViewBag.Filternumb == 1)
+                                {
+                                    <span><button style="padding: 1px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none;background: #ca0505;border: 1px solid #8c0202;" class="submitst" onclick="sendconfig('filtnumb')" id="filtnumb">Отключить</button></span>
+                                }
+                                else if (ViewBag.Filternumb == 0)
+                                {
+                                    <span><button style="padding: 1px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none;" onclick="sendconfig('filtnumb')" id="filtnumb">Включить</button></span>
+                                }
+                            </div>
+                            <div style="padding: 5px 5px 5px 20px;">
+                                <span>3. Настройка таблиц абонентов</span>
+                                <div>
+                                    Текущая таблица: <b>@ViewBag.MainNameId</b>
+                                </div>
+                                <div>
+                                    <select id="maintablabon" style="font-size: 15px;font-weight: normal;width: 200px;border: 1px solid #bdbdbd;padding: 5px;">
+                                        @foreach (var item in ViewBag.LastTask)
+                                        {
+                                            if (ViewBag.MainId == item.Id)
+                                            {
+                                                <option selected value="@item.Id">@item.NameTable</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Id">@item.NameTable</option>
+                                            }
+                                        }
+                                    </select>
+                                    <button style="padding: 2px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none;" id="butsettable" onclick="settable()">Установить</button>
+                                    <button style="padding: 2px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none;" onclick="opendialog()">Добавить</button>
+                                    <button style="padding: 2px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none; background: #ca0505;border: 1px solid #8c0202;" onclick="delltabl()">Удалить</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="total" style="margin: 10px;width: 250px;display: inline-block;">
+                    @*<p style="margin: 0px;">Добавлено всего:</p>*@
+                    <p style="margin: 0px;">Лидов: <b><span id="totliad">@ViewBag.countlid</span></b></p>
+                    <p style="margin: 0px;">Контактов: <b><span id="totcont">@ViewBag.countcont</span></b></p>
+                    <p style="margin: 0px;">Сделок: <b><span id="totdeal">@ViewBag.countdeal</span></b></p>
+                    <p style="margin: 0px;">Компаний: <b><span id="totcomp">@ViewBag.countcomp</span></b></p>
+                    <hr>
+                    <p style="margin: 0px;">Статистика:</p>
+                    <p style="margin: 0px;">Всего номеров: <b><span id="totnum">0</span></b></p>
+                    <p style="margin: 0px;">Обработано: <b><span id="totnumget">0 </span> (<span id="totnumgetproc"></span> %)</b></p>
+                </div>
+                    <div style="width: 350px;display: inline-block;margin: 10px;vertical-align: top;font-size: 13px;">
+                        <a href="/cleardata?member_id=@idmemb">Очистить таблицу</a>
+                        <a style="margin-left:15px;" href="/clearisgetstat?member_id=@idmemb">Очистить статистику</a>
+                    </div>
+                    <div style="float: right;padding: 10px;">
+                        <a href="/excsv?member_id=@idmemb" style="background-color: #28b73e;border: 1px solid #249714;padding: 3px 10px;color: white !important;">Скачать CSV</a>
+                    </div>
+                </div>
+
+            </div>
+
+        @*<footer>
+            <p>
+                &copy; @DateTime.Now.Year - Все права защищены. Powered by AXATA
+            </p>
+        </footer>*@
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            setInterval(setstat, 60000);
+        });
+
+        function settable() {
+            var idtabl = $('#maintablabon option:selected').val();
+            $("#butsettable").css("pointer-events", "none");
+                $.ajax({
+                type: "POST",
+                url: "/settable",
+                    data: { idtabl: idtabl, member_id: '@ViewBag.memberid' },
+                success: function (data) {
+                    if (data == 'ok') {
+                            window.location.href = "/tablabon?member_id=@ViewBag.memberid";
+                        }
+                }
+            });
+        }
+
+        function setstat() {
+            $.ajax({
+                type: "POST",
+                url: "/getstat",
+                data: { member_id: '@ViewBag.memberid' },
+                success: function (data) {
+                    $('#totnum').text(data['total']);
+                    $('#totnumget').text(data['totalsend']);
+                    var proc = (data['totalsend'] / data['total']) * 100;
+                    $('#totnumgetproc').text(proc.toFixed(1));
+                    
+                   
+                }
+            });
+        }
+        function CountdealsProg() {
+            $.ajax({
+                type: "POST",
+                url: "/countdealsprog",
+                data: { member_id: '@ViewBag.memberid' },
+                success: function (data) {
+                    $('#progres').text(data);
+                    $('#obrabot').css("display","inline-block");
+                    
+                   
+                }
+            });
+        } 
+
+        function opendialog() {
+
+            $(".body-content").append("<div class='popup'><div class='popup_bg'></div>" + //Добавляем в тело документа разметку всплывающего окна          
+                "<div class='bay-akk-dialog'><div class='close_cros' style='position: absolute; background-image: url(\"/Content/images/close.png\"); width: 32px; height: 32px; top: -2px; right: 0px; cursor: pointer;'></div>" +
+                "<div><p style='margin: 3px auto;text-align: center;font-size: 18px;color: #561010;font-size: 18px;'>Новая таблица</p></div>" +
+                "<table style='margin: auto;'>" +
+                "<tr><td style='font-size: 13px;'>Название таблицы:</td><td><input id='name_n' class='inputst' type='text' value='' ></td></tr>" +              
+                "<tr><td colspan='2'><button onclick='sendnew()' id='addtable' class='submitst' value='Добавить' style='font-size: 14px;'>Добавить</button></td></tr>" +
+                "</table>" +
+                "</div></div>");
+
+
+            $(".popup").fadeIn(400); // Медленно выводим изображение
+            $(".close_cros").click(function () {    // Событие клика на затемненный фон      
+                $(".popup").fadeOut(400);    // Медленно убираем всплывающее окно
+                setTimeout(function () {    // Выставляем таймер
+                    $(".popup").remove(); // Удаляем разметку всплывающего окна
+                }, 400);
+            });
+        };
+
+        function sendnew() {
+            var name = $('#name_n').val();
+            if (name == '' || name == 'Новая таблица') {
+                alert('Укажите название новой таблицы!');
+                return;
+            }
+            $("#addtable").css("pointer-events", "none");
+                    $.ajax({
+                    type: "POST",
+                        url: "/sendnewtable",
+                        data: { name: name, member_id: '@ViewBag.memberid' },
+                    success: function (data) {
+                        if (data == 'ok') {
+                            window.location.href = "/tablabon?member_id=@ViewBag.memberid";
+                        }
+                    }
+                });
+        }
+        var maintabl = '@ViewBag.MainId';
+        function delltabl() {
+            if (confirm("Удалить выбранную таблицу?")) { 
+                var idtabl = $('#maintablabon option:selected').val();
+                
+                if (idtabl == maintabl) {
+                    alert('Нельзя удалить рабочую таблицу!');
+                    return;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/delltabl",
+                    data: { idtabl: idtabl, member_id: '@ViewBag.memberid' },
+                    success: function (data) {
+                        if (data == 'ok') {
+                            window.location.href = "/tablabon?member_id=@ViewBag.memberid";
+                        }
+                    }
+                });
+            } else {
+                return;
+            }
+        }
+
+        $("body").click(function () {
+            $(".block-checkbox").css("display", "none");
+        });
+
+        $(".block-checkbox").click(function (ev) {
+
+            ev.stopPropagation();
+        });
+        function showCheckboxes(event, srt) {
+            $(".block-checkbox").css("display", "none");
+            $("#" + srt).css("display", "block");
+            event.stopPropagation();
+        }
+        $(".item-ustabnemy").click(function () {
+            var id = $(this).attr("id");
+            $(".user-all-info").css("display", "none");
+            $("#user-" + id).css("display", "block");
+            $(".item-ustabnemy").removeClass("activ-item-us");
+            $("#" + id).addClass("activ-item-us");
+        });
+
+        function checkall(id) {
+            if ($("#check" + id).prop('checked')) {
+                $(".checkall" + id).prop('checked', true);
+            } else {
+                $(".checkall" + id).prop('checked', false);
+            }
+        }
+
+        function sendconfig(type) {
+            $.ajax({
+                type: "POST",
+                url: "/onworkabon",
+                data: { type: type, member_id : '@ViewBag.memberid' },
+                success: function (data) {
+                    if (data['type']=="work") {
+                        if (data['status'] == "1") {
+                            $("#work").css("background", "#ca0505");
+                            $("#work").css("border", "1px solid #8c0202");
+                            $("#work").text("Отключить");
+                        } else if (data['status'] == "0") {
+                            $("#work").css("background", "#288fb7");
+                            $("#work").css("border", "1px solid #024c5e");
+                            $("#work").text("Включить");
+                        }
+                    }
+                    if (data['type'] == 'filtnumb') {
+                        if (data['status'] == "1") {
+                            $("#filtnumb").css("background", "#ca0505");
+                            $("#filtnumb").css("border", "1px solid #8c0202");
+                            $("#filtnumb").text("Отключить");
+                        } else if (data['status'] == "0") {
+                            $("#filtnumb").css("background", "#288fb7");
+                            $("#filtnumb").css("border", "1px solid #024c5e");
+                            $("#filtnumb").text("Включить");
+                        }
+                    }
+                   
+                }
+            });
+        }
+
+        function searchlead() {
+
+            $("#user-li1").css("pointer-events", "none");
+            $("#user-li1").css("opacity", "0.5");
+            var a1 = $('.checkall1:checked');
+            var stadii_arr = [];
+            for (var x = 0; x < a1.length; x++) {
+                stadii_arr.push(a1[x].value);
+            }
+
+            var a2 = $('.checkall2:checked');
+            var asign_arr = [];
+            for (var x = 0; x < a2.length; x++) {
+                asign_arr.push(a2[x].value);
+            }
+
+            var a3 = $('.checkall3:checked');
+            var suors_arr = [];
+            for (var x = 0; x < a3.length; x++) {
+                suors_arr.push(a3[x].value);
+            }
+
+            var date1 = $(".datelead [name='date1-ot']").val();
+            var date2 = $(".datelead [name='date1-do']").val();
+
+            var data = { member_id: '@ViewBag.memberid', status: stadii_arr, asingbyid: asign_arr, sourseid: suors_arr, dateot: date1, datedo: date2  }
+            $.ajax({
+                type: "POST",
+                url: "/searchlead",
+                data: data,
+                success: function (data) {
+                    $("#datareslead").html(data['cont']);
+                    $("#totalreslead").text(data['count']);
+                    $("#user-li1").css("pointer-events", "auto");
+                    $("#user-li1").css("opacity", "1");
+                    $(".datares1 [name='searchlid']").css("display", "inline-block");
+                }
+            });
+        }
+
+       function searchcont() {
+
+            $("#user-li2").css("pointer-events", "none");
+            $("#user-li2").css("opacity", "0.5");
+            var a1 = $('.checkall4:checked');
+            var type_arr = [];
+            for (var x = 0; x < a1.length; x++) {
+                type_arr.push(a1[x].value);
+            }
+
+            var a2 = $('.checkall5:checked');
+            var asign_arr = [];
+            for (var x = 0; x < a2.length; x++) {
+                asign_arr.push(a2[x].value);
+            }
+
+           
+            var date1 = $(".datelead [name='date2-ot']").val();
+            var date2 = $(".datelead [name='date2-do']").val();
+
+           var data = { member_id: '@ViewBag.memberid', type: type_arr, asingbyid: asign_arr,  dateot: date1, datedo: date2  }
+            $.ajax({
+                type: "POST",
+                url: "/searchcont",
+                data: data,
+                success: function (data) {
+                    $("#datarescont").html(data['cont']);
+                    $("#totalrescont").text(data['count']);
+                    $("#user-li2").css("pointer-events", "auto");
+                    $("#user-li2").css("opacity", "1");
+                    $(".datares2 [name='searchlid']").css("display", "inline-block");
+                }
+            });
+        }
+        function searchdeal() {
+            setInterval(CountdealsProg, 5000);
+            $("#user-li3").css("pointer-events", "none");
+            $("#user-li3").css("opacity", "0.5");
+            var a1 = $('.checkall6:checked');
+            var stade_arr = [];
+            for (var x = 0; x < a1.length; x++) {
+                stade_arr.push(a1[x].value);
+            }
+
+            var a2 = $('.checkall7:checked');
+            var asign_arr = [];
+            for (var x = 0; x < a2.length; x++) {
+                asign_arr.push(a2[x].value);
+            }
+          
+            var date1 = $(".datelead [name='date3-ot']").val();
+            var date2 = $(".datelead [name='date3-do']").val();
+
+            var data = { member_id: '@ViewBag.memberid', stade: stade_arr, asingbyid: asign_arr,  dateot: date1, datedo: date2  }
+            $.ajax({
+                type: "POST",
+                url: "/searchdeal",
+                data: data,
+                success: function (data) {
+                    $("#dataresdeal").html(data['cont']);
+                    $("#totalresdeal").text(data['count']);
+                    $("#user-li3").css("pointer-events", "auto");
+                    $("#user-li3").css("opacity", "1");
+                    $(".datares3 [name='searchlid']").css("display", "inline-block");
+                }
+            });
+        }
+       function searchcomp() {
+
+            $("#user-li4").css("pointer-events", "none");
+            $("#user-li4").css("opacity", "0.5");
+            var a1 = $('.checkall8:checked');
+            var status_arr = [];
+            for (var x = 0; x < a1.length; x++) {
+                status_arr.push(a1[x].value);
+            }
+
+            var a2 = $('.checkall9:checked');
+            var asign_arr = [];
+            for (var x = 0; x < a2.length; x++) {
+                asign_arr.push(a2[x].value);
+            }
+          
+            var date1 = $(".datelead [name='date4-ot']").val();
+            var date2 = $(".datelead [name='date4-do']").val();
+
+           var data = { member_id: '@ViewBag.memberid', status: status_arr, asingbyid: asign_arr,  dateot: date1, datedo: date2  }
+            $.ajax({
+                type: "POST",
+                url: "/searchcomp",
+                data: data,
+                success: function (data) {
+                    $("#datarescomp").html(data['cont']);
+                    $("#totalrescomp").text(data['count']);
+                    $("#user-li4").css("pointer-events", "auto");
+                    $("#user-li4").css("opacity", "1");
+                    $(".datares4 [name='searchlid']").css("display", "inline-block");
+                }
+            });
+        }
+
+        function Addleads() {
+            var a1 = $('#datareslead .checkitem:checked');
+            var item_arr = [];
+            for (var x = 0; x < a1.length; x++) {
+                item_arr.push(a1[x].value);
+            }
+            $(".datares1 [name='searchlid']").css("pointer-events", "none");
+            $(".datares1 [name='searchlid']").css("opacity", "0.5");
+            var data = { member_id: '@ViewBag.memberid', items: item_arr }
+            $.ajax({
+                type: "POST",
+                url: "/addleads",
+                data: data,
+                success: function (data) {
+                    $("#totliad").text(data['count']);
+                    $("#suclead").text("Добавлено!");
+                    $(".datares1 [name='searchlid']").css("pointer-events", "auto");
+                    $(".datares1 [name='searchlid']").css("opacity", "1");
+                }
+            });
+        }
+        function addconts() {
+            var a1 = $('#datarescont .checkitem:checked');
+            var item_arr = [];
+            for (var x = 0; x < a1.length; x++) {
+                item_arr.push(a1[x].value);
+            }
+            $(".datares2 [name='searchlid']").css("pointer-events", "none");
+            $(".datares2 [name='searchlid']").css("opacity", "0.5");
+            var data = { member_id: '@ViewBag.memberid', items: item_arr }
+            $.ajax({
+                type: "POST",
+                url: "/addconts",
+                data: data,
+                success: function (data) {
+                    $("#totcont").text(data['count']);
+                    $("#succont").text("Добавлено!");
+                    $(".datares2 [name='searchlid']").css("pointer-events", "auto");
+                    $(".datares2 [name='searchlid']").css("opacity", "1");
+                }
+            });
+        }
+        function adddeals() {
+            var a1 = $('#dataresdeal .checkitem:checked');
+            var item_arr = [];
+            for (var x = 0; x < a1.length; x++) {
+                item_arr.push(a1[x].value);
+            }
+            $(".datares3 [name='searchlid']").css("pointer-events", "none");
+            $(".datares3 [name='searchlid']").css("opacity", "0.5");
+            var data = { member_id: '@ViewBag.memberid', items: item_arr }
+            $.ajax({
+                type: "POST",
+                url: "/adddeals",
+                data: data,
+                success: function (data) {
+                    if (data['count'] == 'error') {
+                        $("#sucdeal").text("Не могу импортировать данные! Попробуйте включить фильтр обработки номеров телефона!");
+                    } else {
+                        $("#totdeal").text(data['count']);
+                        $("#sucdeal").text("Добавлено!");
+                        $(".datares3 [name='searchlid']").css("pointer-events", "auto");
+                        $(".datares3 [name='searchlid']").css("opacity", "1");
+                    }
+                }
+            });
+        }
+        function addcomps() {
+            var a1 = $('#datarescomp .checkitem:checked');
+            var item_arr = [];
+            for (var x = 0; x < a1.length; x++) {
+                item_arr.push(a1[x].value);
+            }
+            $(".datares4 [name='searchlid']").css("pointer-events", "none");
+            $(".datares4 [name='searchlid']").css("opacity", "0.5");
+            var data = { member_id: '@ViewBag.memberid', items: item_arr }
+            $.ajax({
+                type: "POST",
+                url: "/addcomps",
+                data: data,
+                success: function (data) {
+                    $("#totcomp").text(data['count']);
+                    $("#succomp").text("Добавлено!");
+                    $(".datares4 [name='searchlid']").css("pointer-events", "auto");
+                    $(".datares4 [name='searchlid']").css("opacity", "1");
+                }
+            });
+        }
+
+
+    </script>
+    <style>
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        input {
+            border: 1px solid #d5d8d9;
+        }
+
+            input[type="checkbox"] + label {
+                display: block;
+                position: relative;
+                padding-left: 35px;
+                margin-bottom: 20px;
+                font: 15px/20px 'Open Sans', Arial, sans-serif;
+                color: #515050;
+                cursor: pointer;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                margin: 6px;
+                margin-bottom: 6px;
+                top: -9px;
+            }
+
+                input[type="checkbox"] + label:last-child {
+                    margin-bottom: 0;
+                }
+
+                input[type="checkbox"] + label:before {
+                    content: '';
+                    display: block;
+                    width: 16px;
+                    height: 16px;
+                    border: 2px solid #107484;
+                    position: absolute;
+                    left: 5px;
+                    top: 3px;
+                    opacity: .6;
+                    -webkit-transition: all .12s, border-color .08s;
+                    transition: all .12s, border-color .08s;
+                    border-radius: 2px;
+                }
+
+            input[type="checkbox"]:checked + label:before {
+                width: 10px;
+                top: -2px;
+                left: 10px;
+                border-radius: 0;
+                opacity: 1;
+                border-top-color: transparent;
+                border-left-color: transparent;
+                -webkit-transform: rotate(45deg);
+                transform: rotate(45deg);
+            }
+        /*стилизация чекбокс*/
+        button {
+            background-color: #288fb7;
+            border: 1px solid #08526f;
+            padding: 3px 10px;
+            color: white;
+        }
+        .activ-item-us {
+            background: #f4f4f4 !important;
+            color: #0b5775 !important;
+        }
+
+        .item-ustabnemy {
+            float: left;
+            list-style-type: none;
+            
+            border-bottom-width: 1px;
+            border-bottom-width: 1px;
+            border-bottom-width: 1px;
+            border-radius: 0px 2px 2px 0px;
+            padding: 5px 15px;
+            margin: 0px 3px;
+            border-bottom-width: 0;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #288fb7;
+            position: relative;
+            top: 1px;
+            
+        }
+        .user-all-info {
+            background-color: #f4f4f4;
+            display: none;
+        }
+        .user-tab-meny {
+            display: inline-block;
+        }
+        .filtblck {
+            display: inline-block;
+            margin: 10px;
+        }
+        .popup {
+            position: fixed;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+            display: none;
+            text-align: center;
+            z-index: 3;
+        }
+
+        .popup_bg {
+            background: rgba(0,0,0,0.6);
+            position: absolute;
+            z-index: 4;
+            height: 100%;
+            width: 100%;
+        }
+
+        .popup_img {
+            position: relative;
+            z-index: 5;
+            height: 90%;
+            border-radius: 5px;
+            top: 5%;
+            max-width: 100%;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .bay-akk-dialog {
+            background-color: #fff;
+            display: inline-block;
+            left: 50%;
+            opacity: 1;
+            padding: 15px;
+            position: fixed;
+            text-align: justify;
+            top: 50%;
+            width: 380px;
+            z-index: 10;
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            -ms-border-radius: 10px;
+            -o-border-radius: 10px;
+            border-radius: 10px;
+            -webkit-box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+            -moz-box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+            -ms-box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+            -o-box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+            -webkit-transition: opacity .5s, top .5s;
+            -moz-transition: opacity .5s, top .5s;
+            -ms-transition: opacity .5s, top .5s;
+            -o-transition: opacity .5s, top .5s;
+            transition: opacity .5s, top .5s;
+        }
+
+    </style>
+</body>
+</html>

@@ -46,6 +46,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=22.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.22.1.2\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -54,8 +57,24 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -160,6 +179,7 @@
     <Compile Include="Controllers\AlfacrmController.cs" />
     <Compile Include="Controllers\AmoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ParsContController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -169,8 +189,15 @@
     <Compile Include="Models\BlackList.cs" />
     <Compile Include="Models\Compan.cs" />
     <Compile Include="Models\Contex.cs" />
+    <Compile Include="Models\RoisColler.cs" />
+    <Compile Include="Models\RoisConfig.cs" />
+    <Compile Include="Models\RoisData.cs" />
+    <Compile Include="Models\RoisGroup.cs" />
+    <Compile Include="Models\RoistNumb.cs" />
     <Compile Include="Models\Script.cs" />
+    <Compile Include="Models\TaskAbonent.cs" />
     <Compile Include="Models\Tiket.cs" />
+    <Compile Include="Models\TimeEntit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\AlfacrmFunction.cs" />
     <Compile Include="Service\amoFunction.cs" />
@@ -225,6 +252,8 @@
     <Content Include="Views\Amo\Index.cshtml" />
     <Content Include="Views\Home\Writer.cshtml" />
     <Content Include="Views\Home\Script.cshtml" />
+    <Content Include="Views\ParsCont\Index.cshtml" />
+    <Content Include="Views\ParsCont\SearchLead.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

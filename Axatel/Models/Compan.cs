@@ -22,5 +22,8 @@ namespace Axatel.Models
         public int IdFolder { get; set; }
         public int Activ { get; set; }
         public int IsScript { get; set; }
+         public int IdMainTblAbon { get; set; }
+
+
     }
 }

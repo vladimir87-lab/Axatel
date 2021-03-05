@@ -18,5 +18,10 @@ namespace Axatel.Models
         public string Type { get; set; }
         public string BackIp { get; set; }
 
+        public string InCall { get; set; }
+        public string OutCall { get; set; }
+        public string BadCall { get; set; }
+        public int TagCall { get; set; }
+
     }
 }

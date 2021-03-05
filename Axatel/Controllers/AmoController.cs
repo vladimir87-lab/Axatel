@@ -296,9 +296,11 @@ namespace Axatel.Controllers
             string[] have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER);
             if (have == null)
             {
-                datauser[0] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv);
+                datauser[0] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта
                 datauser[1] = "Новый контакт";
                 datauser[2] = "0";
+
+              
             }
             else
             {
@@ -317,6 +319,137 @@ namespace Axatel.Controllers
             return Json(new { idcont = datauser[0], namecont = datauser[1], inernumb = datauser[2] }, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult CreatDeal(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID, string Link, int Duration, string Type,  int Cosht=0, string Tag="")
+        {
+            RefSetToken(AMO_URL);
+            amoCompan co = _db.amoCompans.Where(p => p.PortalName == AMO_URL).Where(a => a.AxatelGuid == AXATEL_GUID).FirstOrDefault();
+            if (co == null) { return Content("Портал не найден"); }
+            string otv = func.GetUsers(co.PortalName, co.AcesTok); // получаем ид любого админа
+            string[] have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER); // 0- ответсвенный, 1- имя контакта, 2- ид контакта
+            List<string> lststatus = func.StatusDeal(co.PortalName, co.AcesTok);// список ид пропускных статусов сделок
+
+            switch (Type)
+            {
+                case "incoming":
+                    if(co.InCall == "none")
+                    {
+                        break;
+                    }else if (co.InCall == "cont")
+                    {                       
+                        if (have == null)
+                        {
+                            func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                    }else if (co.InCall == "deal")
+                    {
+                        if (have == null)
+                        {
+                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+                        if (havedeals2 == false)
+                        {
+                            if (co.TagCall == 0) { Tag = ""; }
+                             func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER);                           
+                        }
+                    }
+                    else if (co.InCall == "neraz")
+                    {
+                        if (have == null)
+                        {
+                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+                        if (havedeals2 == false)
+                        {
+                            if (co.TagCall == 0) { Tag = ""; }
+                            func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration);
+                        }
+                    }
+                        break;
+                case "outgoing":
+                    if (co.OutCall == "none")
+                    {
+                        break;
+                    }
+                    else if (co.OutCall == "cont")
+                    {
+                        if (have == null)
+                        {
+                            func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                    }
+                    else if (co.OutCall == "deal")
+                    {
+                        if (have == null)
+                        {
+                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+                        if (havedeals2 == false)
+                        {
+                            if (co.TagCall == 0) { Tag = ""; }
+                            func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER);
+                        }
+                    }
+                    else if (co.OutCall == "neraz")
+                    {
+                        if (have == null)
+                        {
+                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+                        if (havedeals2 == false)
+                        {
+                            if (co.TagCall == 0) { Tag = ""; }
+                            func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration);
+                        }
+                    }
+                    break;
+                case "missed":
+                    if (co.BadCall == "none")
+                    {
+                        break;
+                    }
+                    else if (co.BadCall == "cont")
+                    {
+                        if (have == null)
+                        {
+                            func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                    }
+                    else if (co.BadCall == "deal")
+                    {
+                        if (have == null)
+                        {
+                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+                        if (havedeals2 == false)
+                        {
+                            if (co.TagCall == 0) { Tag = ""; }
+                            func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER);
+                        }
+                    }
+                    else if (co.BadCall == "neraz")
+                    {
+                        if (have == null)
+                        {
+                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+                        if (havedeals2 == false)
+                        {
+                            if (co.TagCall == 0) { Tag = ""; }
+                            func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration);
+                        }
+                    }
+                    break;
+                default:                   
+                    break;
+            }           
+            return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
+        }
 
 
         //Закрытый метод для получения и записи Токенов авторизации

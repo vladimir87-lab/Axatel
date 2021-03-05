@@ -196,6 +196,147 @@ namespace Axatel
            defaults: new { controller = "Home", action = "Log" }
            );
 
+            routes.MapRoute(
+            name: "LoadImgScript",
+            url: "Content/addscript/{idport}",
+            defaults: new { controller = "Home", action = "LoadImgScript",idport = UrlParameter.Optional }
+            );
+            routes.MapRoute(
+            name: "ParsCont",
+            url: "tablabon",
+            defaults: new { controller = "ParsCont", action = "Index" }
+            );
+            routes.MapRoute(
+            name: "SearchLead",
+            url: "searchlead",
+            defaults: new { controller = "ParsCont", action = "SearchLead" }
+            );
+            routes.MapRoute(
+            name: "SearchCont",
+            url: "searchcont",
+            defaults: new { controller = "ParsCont", action = "SearchCont" }
+            );
+            routes.MapRoute(
+            name: "SearchDeal",
+            url: "searchdeal",
+            defaults: new { controller = "ParsCont", action = "SearchDeal" }
+            );
+            routes.MapRoute(
+            name: "SearchComp",
+            url: "searchcomp",
+            defaults: new { controller = "ParsCont", action = "SearchComp" }
+            );
+
+            routes.MapRoute(
+            name: "AddComps",
+            url: "addcomps",
+            defaults: new { controller = "ParsCont", action = "AddComps" }
+            );
+            routes.MapRoute(
+            name: "AddDeals",
+            url: "adddeals",
+            defaults: new { controller = "ParsCont", action = "AddDeals" }
+            );
+            routes.MapRoute(
+            name: "AddConts",
+            url: "addconts",
+            defaults: new { controller = "ParsCont", action = "AddConts" }
+            );
+            routes.MapRoute(
+            name: "AddLeads",
+            url: "addleads",
+            defaults: new { controller = "ParsCont", action = "AddLeads" }
+            );
+            routes.MapRoute(
+            name: "Number",
+            url: "method/callmanager/number",
+            defaults: new { controller = "ParsCont", action = "Number" }
+            );
+
+            routes.MapRoute(
+            name: "CallmanagerFinish",
+            url: "method/callmanager/finish",
+            defaults: new { controller = "ParsCont", action = "Finish" }
+            );
+            routes.MapRoute(
+            name: "Onworkabon",
+            url: "onworkabon",
+            defaults: new { controller = "ParsCont", action = "Onworkabon" }
+            );
+            routes.MapRoute(
+            name: "ClearData",
+            url: "cleardata",
+            defaults: new { controller = "ParsCont", action = "ClearData" }
+            );
+            routes.MapRoute(
+            name: "ClearIsgetStat",
+            url: "clearisgetstat",
+            defaults: new { controller = "ParsCont", action = "ClearIsgetStat" }
+            );
+            routes.MapRoute(
+            name: "GetStat",
+            url: "getstat",
+            defaults: new { controller = "ParsCont", action = "GetStat" }
+            );
+            routes.MapRoute(
+            name: "ExCSV",
+            url: "excsv",
+            defaults: new { controller = "ParsCont", action = "ExCSV" }
+            );
+            routes.MapRoute(
+            name: "CountdealsProg",
+            url: "countdealsprog",
+            defaults: new { controller = "ParsCont", action = "CountdealsProg" }
+            );
+            routes.MapRoute(
+            name: "DellTabl",
+            url: "delltabl",
+            defaults: new { controller = "ParsCont", action = "DellTabl" }
+            );
+            routes.MapRoute(
+            name: "SendnewTable",
+            url: "sendnewtable",
+            defaults: new { controller = "ParsCont", action = "SendnewTable" }
+            );
+            routes.MapRoute(
+            name: "SetTable",
+            url: "settable",
+            defaults: new { controller = "ParsCont", action = "SetTable" }
+            );
+            routes.MapRoute(
+            name: "Roistat",
+            url: "method/roistat",
+            defaults: new { controller = "Home", action = "Roistat" }
+            );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             routes.MapRoute(
            name: "AmoDefault",
@@ -233,6 +374,12 @@ namespace Axatel
             url: "method/amo/reg",
             defaults: new { controller = "Amo", action = "RegContact" }
             );
+            routes.MapRoute(
+            name: "AmoCreatDeal",
+            url: "method/amo/creatdeal",
+            defaults: new { controller = "Amo", action = "CreatDeal" }
+            );
+            
 
             routes.MapRoute(
             name: "AlfacrmZvonok",
@@ -272,11 +419,17 @@ namespace Axatel
 
 
 
+            routes.MapRoute(
+            name: "OnScript",
+            url: "onscript",
+            defaults: new { controller = "Home", action = "OnScript" }
+            );
 
+            
             routes.MapRoute(
             name: "Script",
-            url: "script",
-            defaults: new { controller = "Home", action = "Script" }
+            url: "script/{member_id}/{id}",
+            defaults: new { controller = "Home", action = "Script", id = UrlParameter.Optional, member_id = UrlParameter.Optional }
             );
              
             routes.MapRoute(

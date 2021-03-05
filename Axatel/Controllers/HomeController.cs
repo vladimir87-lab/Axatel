@@ -20,8 +20,8 @@ namespace Axatel.Controllers
     {
         Context _db = new Context();
         Service.Function func = new Service.Function();
-        static string client_id = "app.5e76175e7ed6c9.84942186";
-        static string client_secret = "DQAPkjKmX3uwA24Pf1NExrYwQ6GugYSC1r55V17Etbkea57UUV";
+        public static string client_id = "app.5e76175e7ed6c9.84942186";
+        public static string client_secret = "DQAPkjKmX3uwA24Pf1NExrYwQ6GugYSC1r55V17Etbkea57UUV";
 
 
         public ActionResult Licenzia()
@@ -36,7 +36,7 @@ namespace Axatel.Controllers
         public ActionResult Index(string member_id = "")
         {
 
-            // return Content("ok");
+           //  return Content("ok");
             return RedirectToAction("MainPage", new { member_id = member_id });
         }
         public ActionResult MainPage(string member_id)
@@ -48,6 +48,15 @@ namespace Axatel.Controllers
             {
                 return RedirectToAction("Intro", new { member_id = member_id });
             }
+            // обрываем парсинг
+            Axatel.Controllers.ParsContController.Statuspars stat = ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault();
+            if (stat == null)
+            {
+                ParsContController.stadeal.Add(new ParsContController.Statuspars { Portal = comp.Portal, flagdeal = false });
+            }
+            ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault().flagdeal = false;
+            // обрываем парсинг
+
             RefSetToken(comp.Portal);
             ViewBag.Memb = member_id;
             return View(comp);
@@ -458,13 +467,11 @@ namespace Axatel.Controllers
                 _db.SaveChanges();
 
             }
-
             return RedirectToAction("MainPage", new { member_id = member_id });
-
         }
 
         //Закрытый метод для получения и записи Токенов авторизации
-        private void RefSetToken(string portal)
+        public void RefSetToken(string portal)
         {
             Compan conm = _db.Compans.Where(i => i.Portal == portal).FirstOrDefault();
 
@@ -834,6 +841,14 @@ namespace Axatel.Controllers
             {
                 return RedirectToAction("Intro", new { member_id = member_id });
             }
+            // обрываем парсинг
+            Axatel.Controllers.ParsContController.Statuspars stat = ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault();
+            if (stat == null)
+            {
+                ParsContController.stadeal.Add(new ParsContController.Statuspars { Portal = comp.Portal, flagdeal = false });
+            }
+            ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault().flagdeal = false;
+            // обрываем парсинг
             List<BlackList> blist = _db.BlackLists.Where(i => i.PortalId == comp.Id).OrderByDescending(d => d.Date).ToList();
             ViewBag.Memb = member_id;
             return View(blist);
@@ -879,6 +894,14 @@ namespace Axatel.Controllers
             {
                 return RedirectToAction("Intro", new { member_id = member_id });
             }
+            // обрываем парсинг
+            Axatel.Controllers.ParsContController.Statuspars stat = ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault();
+            if (stat == null)
+            {
+                ParsContController.stadeal.Add(new ParsContController.Statuspars { Portal = comp.Portal, flagdeal = false });
+            }
+            ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault().flagdeal = false;
+            // обрываем парсинг
             ViewBag.Memb = member_id;
             return View();
         }
@@ -1161,16 +1184,9 @@ namespace Axatel.Controllers
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Writer(string Id = "", string member_id = "")
+        public ActionResult OnScript(string member_id)
         {
             Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
-
-            if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
-            if (comp.Activ == 0)
-            {
-                return RedirectToAction("Intro", new { member_id = member_id });
-            }
-
             if (comp.IsScript == 0)
             {
                 RefSetToken(comp.Portal);
@@ -1187,7 +1203,57 @@ namespace Axatel.Controllers
                     content = request.Post("https://" + comp.Portal + "/rest/placement.bind?auth=" + comp.AcesTok, contentText2, "application/json").ToString();
                 }
                 comp.IsScript = 1;
+                _db.Entry(comp).State = System.Data.Entity.EntityState.Modified;
+                _db.SaveChanges();
+                return RedirectToAction("Writer", new { member_id = member_id });
             }
+            else
+            {
+                RefSetToken(comp.Portal);
+                var data = new
+                {
+                    PLACEMENT = "CALL_CARD",
+                    HANDLER = "https://service-axatel.ru:8099/script"
+                };
+                string contentText2 = JsonConvert.SerializeObject(data).ToString();
+                string content;
+
+                try
+                {
+                    using (xNet.HttpRequest request = new xNet.HttpRequest())
+                    {
+                        content = request.Post("https://" + comp.Portal + "/rest/placement.unbind?auth=" + comp.AcesTok, contentText2, "application/json").ToString();
+                    }
+                }
+                catch {
+                    return Content("Обновите приложение!<br>В левой колонке - Приложения - Установленные - Обновить.");
+                }
+                comp.IsScript = 0;
+                _db.Entry(comp).State = System.Data.Entity.EntityState.Modified;
+                _db.SaveChanges();
+                return RedirectToAction("Writer", new { member_id = member_id });
+            }
+
+        }
+        // страница создания скрипта
+        public ActionResult Writer(string Id = "", string member_id = "", int status=0)
+        {
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
+
+            if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
+            if (comp.Activ == 0)
+            {
+                return RedirectToAction("Intro", new { member_id = member_id });
+            }
+            // обрываем парсинг
+            Axatel.Controllers.ParsContController.Statuspars stat = ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault();
+            if (stat == null)
+            {
+                ParsContController.stadeal.Add(new ParsContController.Statuspars { Portal = comp.Portal, flagdeal = false });
+            }
+            ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault().flagdeal = false;
+            // обрываем парсинг
+
             List<Script> sc = _db.Scripts.Where(i => i.IdPortal == comp.Id).OrderBy(i => i.Title).ToList();
             if (Id != "")
             {
@@ -1195,11 +1261,17 @@ namespace Axatel.Controllers
                 ViewBag.Title = sc.Where(i => i.Id.ToString() == Id).FirstOrDefault().Title;
                 ViewBag.Id = sc.Where(i => i.Id.ToString() == Id).FirstOrDefault().Id;
             }
-
+            if (status== 1)
+            {
+                ViewBag.Error = "<p style=\"color: red; \">Заполните пустые поля!</p>";
+            }
+            ViewBag.Memb = member_id;
+            ViewBag.IsOnscript = comp.IsScript;
+            ViewBag.IdPortal = comp.Id;
             return View(sc);
         }
-        // страница скрипта
-        public ActionResult Script(string member_id)
+        // страница скрипта для загрузки в карточку
+        public ActionResult Script(string member_id, string id="")
         {
             Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
 
@@ -1209,8 +1281,25 @@ namespace Axatel.Controllers
             {
                 return RedirectToAction("Intro", new { member_id = member_id });
             }
+            // обрываем парсинг
+            Axatel.Controllers.ParsContController.Statuspars stat = ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault();
+            if (stat == null)
+            {
+                ParsContController.stadeal.Add(new ParsContController.Statuspars { Portal = comp.Portal, flagdeal = false });
+            }
+            ParsContController.stadeal.Where(p => p.Portal == comp.Portal).FirstOrDefault().flagdeal = false;
+            // обрываем парсинг
+            List<Script> sc = _db.Scripts.Where(i => i.IdPortal == comp.Id).OrderBy(i => i.Title).ToList();
+            string Text = "";
+            if (!string.IsNullOrEmpty(id))
+            {
+                Text = sc.Where(i => i.Id.ToString() == id).FirstOrDefault().Text;
+            }
+            ViewBag.Text = Text;
+            ViewBag.Memb = member_id;
 
-            return View();
+
+            return View(sc);
         }
 
 
@@ -1226,14 +1315,19 @@ namespace Axatel.Controllers
             Script script = _db.Scripts.Where(i => i.Id.ToString() == Id).FirstOrDefault();
             _db.Entry(script).State = System.Data.Entity.EntityState.Deleted;
             _db.SaveChanges();
+            Directory.Delete(System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/" + script.Id),true);
             return Content("ok");
 
         }
         [ValidateInput(false)]
-        public ActionResult AddScript( string Text, string Title, string member_id, string Id)
+        public ActionResult AddScript( string Text, string Title, string member_id, string Id )
         {
-            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
 
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
+            if ( Text.Length < 6 || string.IsNullOrEmpty(Title))
+            {
+                return RedirectToAction("Writer", new { member_id = member_id, status = 1 });
+            }
             if (comp == null) return Content("<h2 style=\"text-aligncenter; text-align:center; margin-top: 30px; \">Доступ в приложение разрешен только лицу установившему приложение.<h2>");
             if (comp.Activ == 0)
             {
@@ -1241,11 +1335,25 @@ namespace Axatel.Controllers
             }
             if (Id != "")
             {
+                
                 Script script = _db.Scripts.Where(i => i.Id.ToString() == Id).FirstOrDefault();
+                Text = Text.Replace("/Content/imgscript/now/"+ comp.Id+"/", "/Content/imgscript/"+Id+"/");
                 script.Text = Text;
                 script.Title = Title;
                 _db.Entry(script).State = System.Data.Entity.EntityState.Modified;
                 _db.SaveChanges();
+                //создаем директорию под файлы соответств ид скрипта
+                if (!System.IO.Directory.Exists(System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/" + script.Id)))
+                {
+                    System.IO.Directory.CreateDirectory(System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/" + script.Id));
+                }
+                string[] files = Directory.GetFiles(System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/now/" + comp.Id)); // читаем файлы из временной папки 
+                foreach(var item in files)
+                {
+                    string filename = Path.GetFileName(item);
+                    System.IO.File.Move(item, System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/" + script.Id+"/"+ filename));
+                }
+
                 return RedirectToAction("Writer", new { Id = script.Id, member_id = member_id });
             }
             else
@@ -1257,10 +1365,58 @@ namespace Axatel.Controllers
 
                 _db.Scripts.Add(nscript);
                 _db.SaveChanges();
+                 nscript.Text = Text.Replace("/Content/imgscript/now/" + comp.Id + "/", "/Content/imgscript/" + nscript.Id + "/");
+                _db.Entry(nscript).State = System.Data.Entity.EntityState.Modified;
+                _db.SaveChanges();
+                //создаем директорию под файлы соответств ид скрипта
+                if (!System.IO.Directory.Exists(System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/" + nscript.Id)))
+                {
+                    System.IO.Directory.CreateDirectory(System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/" + nscript.Id));
+                }
+                string[] files = Directory.GetFiles(System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/now/" + comp.Id)); // читаем файлы из временной папки 
+                foreach (var item in files)
+                {
+                    string filename = Path.GetFileName(item);
+                    System.IO.File.Move(item, System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/" + nscript.Id + "/" + filename));
+                }
                 return RedirectToAction("Writer", new { Id = nscript.Id, member_id = member_id });
             }
         }
         
+        public ActionResult LoadImgScript(HttpPostedFileBase upload, int idport=0)
+        {
+            
+            if (upload.ContentLength > 5000000)
+            {
+                return Json(new { uploaded = 0, fileName = upload.FileName, url = upload.FileName, error = new { message = "Превышен размер файла! Максимальный размер 5Mb!" } });
+            }
+
+            string newfm = Guid.NewGuid().ToString();
+            string sign = "";
+            try
+            {
+                sign = upload.FileName.Split('.')[1];
+            }
+            catch
+            {
+                return Json(new { uploaded = 0, fileName = upload.FileName, url = upload.FileName, error = new { message = "Непонятное имя файла!" } });
+            }
+            string pacth = System.Web.Hosting.HostingEnvironment.MapPath("/Content/imgscript/now/"+ idport +"/");
+            if (!System.IO.Directory.Exists(pacth))
+            {
+                System.IO.Directory.CreateDirectory(pacth);
+            }
+            string[] badname = new string[] { "JPG", "JPEG", "BMP", "TIFF", "PNG", "GIF" };
+            if (!badname.Contains(sign.ToUpper()))
+            {
+                return Json(new { uploaded = 0, fileName = upload.FileName, url = upload.FileName, error = new { message = "Запрещенный файл!" } });
+            }
+            string urlfile = "/Content/imgscript/now/" + idport + "/" + newfm+"."+ sign;
+            upload.SaveAs(pacth + newfm + "." + sign);
+            
+            return Json(new {uploaded=1, fileName = newfm + "." + sign, url = urlfile   });
+        }
+
 
 
 
@@ -1455,6 +1611,53 @@ namespace Axatel.Controllers
 
             return Content("9");
 
+        }
+
+        public class Auths
+        {
+            public string token { get; set; }
+        }
+        public class DataOtvet
+        {
+            public int timeout_seconds { get; set; }
+            public string[] phones { get; set; }
+            public string priority { get; set; }
+        }
+        public ActionResult Roistat(Auths auth, string numb)
+        {
+            RoisConfig rc = _db.RoisConfigs.Where(i => i.Token == auth.token).FirstOrDefault();
+            if (rc == null)
+            {
+                return Json(new { success = "false", error = "Не верный токен авторизации!" });
+            }
+
+            RoistNumb roisnumb = _db.RoistNumb.Where(i => i.Number == numb.Trim()).FirstOrDefault();
+            if (roisnumb ==null)
+            {
+                return Json( new { success ="false", error = "Ошибка! Нет соответствующих строк таблице номеров" });
+            }
+            List<RoisColler> roiscols = _db.RoisCollers.Where(i => i.IdRois == roisnumb.IdRois).ToList();
+            if (roiscols.Count == 0)
+            {
+                return Json(new { success = "false", error = "Ошибка! Нет соответствующих строк таблице номеров переадресации" });
+            }
+            RoisData rd = _db.RoisDatas.Where(i => i.Id == roisnumb.IdRois).FirstOrDefault();
+
+            int[] countgroup = roiscols.Select(i => i.IdGroup).Distinct().ToArray();
+
+            List<RoisGroup> lstgroup = _db.RoisGroups.ToList();
+
+            List<DataOtvet> datas = new List<DataOtvet>();
+            foreach (var item in countgroup)
+            {
+                DataOtvet d_o = new DataOtvet();
+                d_o.priority = lstgroup.Where(i => i.Id == item).FirstOrDefault().Priority.ToString();
+                d_o.timeout_seconds = lstgroup.Where(i => i.Id == item).FirstOrDefault().TimeSec;
+                d_o.phones = roiscols.Where(i => i.IdGroup == item).Select(q => q.Number).ToArray();
+                datas.Add(d_o);
+            }
+
+            return Json(new { groups = datas, auth = new { project = rd.Project, key = rd.Token } } );
         }
 
 
