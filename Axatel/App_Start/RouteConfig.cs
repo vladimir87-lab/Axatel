@@ -284,6 +284,19 @@ namespace Axatel
             defaults: new { controller = "ParsCont", action = "ExCSV" }
             );
             routes.MapRoute(
+            name: "InpCsv",
+            url: "inpcsv",
+            defaults: new { controller = "ParsCont", action = "InpCSV" }
+            );
+            routes.MapRoute(
+            name: "SaveVoiceBot",
+            url: "savevoicebot",
+            defaults: new { controller = "ParsCont", action = "SaveVoiceBot" }
+            );
+            
+
+
+            routes.MapRoute(
             name: "CountdealsProg",
             url: "countdealsprog",
             defaults: new { controller = "ParsCont", action = "CountdealsProg" }
@@ -346,7 +359,7 @@ namespace Axatel
             routes.MapRoute(
             name: "AmoReg",
             url: "method/amo/finish",
-            defaults: new { controller = "Amo", action = "Reg" }
+            defaults: new { controller = "Amo", action = "Finish" }
             );
             routes.MapRoute(
             name: "AmoShowEvent",
@@ -379,7 +392,20 @@ namespace Axatel
             url: "method/amo/creatdeal",
             defaults: new { controller = "Amo", action = "CreatDeal" }
             );
+            routes.MapRoute(
+            name: "GetParam",
+            url: "method/amo/getparam",
+            defaults: new { controller = "Amo", action = "GetParam"}
+            );
+            routes.MapRoute(
+            name: "SetParam",
+            url: "method/amo/setparam",
+            defaults: new { controller = "Amo", action = "SetParam" }
+            );
             
+
+
+
 
             routes.MapRoute(
             name: "AlfacrmZvonok",

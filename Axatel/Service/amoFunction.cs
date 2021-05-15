@@ -20,9 +20,14 @@ namespace Axatel.Service
             if (status == 6) { duration = 0; CALL_FINISH_DATE = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");  }
             string result = "";
             if (status == 4) { result = "Звонок cостоялся"; }
-            else if (status == 6) { result = "Пропущеный"; }
+            else if (status == 1) { result = "Оставил голосовое сообщение"; }
+            else if (status == 2) { result = "Перезвонить позже"; }
+            else if (status == 3) { result = "Нет на месте"; }
+            else if (status == 5) { result = "Неверный номер"; }
+            else if (status == 7) { result = "Номер занят"; }
+
             // DateTime td = DateTimeю.Parse(CALL_START_DATE);
-         //   DateTimeOffset td = DateTimeOffset.Now;
+            //   DateTimeOffset td = DateTimeOffset.Now;
             DateTimeOffset tdn = DateTimeOffset.Parse(CALL_FINISH_DATE);
             Guid guid = Guid.NewGuid();
             var data = new
@@ -45,6 +50,11 @@ namespace Axatel.Service
                 }
             };
             string contentText2 = JsonConvert.SerializeObject(data).ToString();
+            string pach = System.Web.Hosting.HostingEnvironment.MapPath("/logamo.txt");
+            System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
+            myfile.WriteLine(DateTime.Now.ToString() + "--FinishJson--Data:" + contentText2 +"--Portal:"+ portal + "\n\n");
+            myfile.Close();
+            myfile.Dispose();
             string content;
             using (xNet.HttpRequest request = new xNet.HttpRequest())
             {
@@ -105,6 +115,31 @@ namespace Axatel.Service
                 return iduser;
             }
         }
+        public void CreatTask(string portal, string acectok, string otv, string otvzakont, int idcon, int tasktypeid)
+        {
+            DateTimeOffset td = DateTimeOffset.Now;
+            DateTimeOffset td2 = td.AddHours(1);
+            var data = new[]
+            {
+              new{
+                   text = "Пропущеный звонок",
+                   complete_till= td2.ToUnixTimeSeconds(),
+                    created_at= td.ToUnixTimeSeconds(),
+                    responsible_user_id= Convert.ToInt32(otvzakont),
+                    created_by = Convert.ToInt32(otv),
+                    entity_type = "contacts",
+                    entity_id = idcon,
+                    task_type_id = tasktypeid
+                }
+            };
+            string contentText2 = JsonConvert.SerializeObject(data).ToString();
+            string content;
+            using (xNet.HttpRequest request = new xNet.HttpRequest())
+            {
+                request.AddHeader("Authorization", " Bearer " + acectok);
+                content = request.Post("https://" + portal + "/api/v4/tasks", contentText2, "application/json").ToString();
+            }
+        }
 
         public string CreatCont(string portal, string acectok, string tel, string userid)
         {
@@ -158,9 +193,30 @@ namespace Axatel.Service
             string iduser = obj2._embedded.items[0].id.ToString();
             return iduser;
         }
+        public class Dopdata{
+            public int field_id { get; set; }
+            public object[] values { get; set; }
 
-        public int CreatDeal(string portal, string acectok, int cosht, int idcont, int idotv, string tag, string number)
+        } 
+        public int CreatDeal(string portal, string acectok, int cosht, int idcont, int idotv, string tag, string number, Dictionary<string, string> dicdop)
         {
+            Dopdata[] dopdatas = new Dopdata[dicdop.Count];
+
+            int i = 0;
+            foreach (var item in dicdop)
+            {
+                Dopdata dopdata = new Dopdata();
+                dopdata.field_id = Convert.ToInt32(item.Key);
+                dopdata.values = new[] { new { value = item.Value.ToString() } };
+                dopdatas[i] = dopdata;
+                i++;
+            }
+           
+            
+            foreach (var item in dicdop)
+            {
+                
+            }
             var data = new[]
             {
                 new
@@ -169,6 +225,12 @@ namespace Axatel.Service
                      created_by = idotv,
                      responsible_user_id = idotv,
                      price = cosht,
+                     //custom_fields_values = new[]
+                     //{
+                     //    new {field_id = Convert.ToInt32(iddopfild), values = new[]{ new { value = namedopfild } }  }
+
+                     //}, 
+                     custom_fields_values = dopdatas,
                      _embedded = new
                      {
 
@@ -230,8 +292,9 @@ namespace Axatel.Service
             return lstidstat;
         }
 
-        public bool ifhaveDeals(string portal, string acectok, int idcont, List<string> lststatus)
+        public bool ifhaveDeals(string portal, string acectok, int idcont/*, List<string> lststatus*/)
         {
+            List<string> lststatus = new List<string>() {"142", "143" };
             var converter = new ExpandoObjectConverter();
             string content;
             using (xNet.HttpRequest request = new xNet.HttpRequest())
@@ -257,12 +320,16 @@ namespace Axatel.Service
                 dynamic obj2 = JsonConvert.DeserializeObject<ExpandoObject>(content2, converter);
                 if (lststatus.Contains(obj2.status_id.ToString()))
                 {
+                    continue;
+                }
+                else
+                {
                     flag = true;
                 }
             }
             return flag;
         }
-        public int CreatRazobrab(string portal, string acectok, int cosht, int idcont, int idotv, string tag, string number, string link, int duration )
+        public int CreatRazobrab(string portal, string acectok, int cosht, int idcont, int idotv, string tag, string number, string link, int duration, string iddopfild, string namedopfild)
         {
             var converter = new ExpandoObjectConverter();
             string content2;
@@ -304,6 +371,10 @@ namespace Axatel.Service
                          {
                              new{ name = "Новая сделка",
                                  price = cosht,
+                                 custom_fields_values = new[]
+                                 {
+                                     new {field_id = Convert.ToInt32(iddopfild), values = new[]{ new { value = namedopfild } }  }
+                                 },
                                  _embedded = new{
                                         tags = new[]
                                         {
@@ -415,6 +486,37 @@ namespace Axatel.Service
                 userlst.Add(user);
             }
             return userlst;
+        }
+        public string CreatDopFildDeal(string portal, string acectok)
+        {
+            var data = new[]
+            {
+                new
+                {
+                    name = "Источник-аксател",
+                    type = "select",
+                     enums = new[]
+                     {
+
+                        new { value="GoogleAds", sort=1},
+                        new { value="Яндекс.Директ", sort=2},
+                        new { value="Соц. сети", sort=3},
+                        new { value="Бесплатные площадки", sort=4},
+                        new { value="Офлайн источники", sort=5},
+                        new { value="Прямой трафик", sort=6}
+                     }
+                }
+            };
+            string contentText2 = JsonConvert.SerializeObject(data).ToString();
+            string content;
+            using (xNet.HttpRequest request = new xNet.HttpRequest())
+            {
+                request.AddHeader("Authorization", " Bearer " + acectok);
+                content = request.Post("https://" + portal + "/api/v4/leads/custom_fields", contentText2, "application/json").ToString();
+            }
+            var converter = new ExpandoObjectConverter();
+            dynamic obj = JsonConvert.DeserializeObject<ExpandoObject>(content, converter);
+            return obj._embedded.custom_fields[0].id.ToString();
         }
     }
 }

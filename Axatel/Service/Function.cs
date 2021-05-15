@@ -238,12 +238,17 @@ namespace Axatel.Service
         // прикрепление записи
         public int Record(string CALL_Guid, string B24_URL, string FILE_CONTENT, string URL, string Ip, string AcesTok)
         {
-           
+
+            if (URL.IndexOf("http") == -1)
+            {
+                URL = "http://" + Ip + URL;
+            }
+
             var data2 = new
             {
                 CALL_ID = CALL_Guid,
                 FILENAME = CALL_Guid + ".mp3",
-                RECORD_URL = "http://"+ Ip + URL
+                RECORD_URL = URL
             };
             string contentText2 = JsonConvert.SerializeObject(data2).ToString();        
             using (xNet.HttpRequest request2 = new xNet.HttpRequest())

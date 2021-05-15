@@ -180,12 +180,13 @@ namespace Axatel.Controllers
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Record(string INTAPP, string AXATEL_GUID, string CALL_Guid, string B24_URL, string FILE_CONTENT, string URL, string PROCES_STATUS)
+        public ActionResult Record(string INTAPP, string AXATEL_GUID, string CALL_Guid, string B24_URL, string URL, string PROCES_STATUS, string FILE_CONTENT = "")
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
-            System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
+            
             string filecont = "";
             if (FILE_CONTENT.Length > 10) { filecont = FILE_CONTENT.Substring(0, 10); } else { filecont = FILE_CONTENT; };
+            System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
             try {
                 myfile.WriteLine(DateTime.Now.ToString() + "--Record--AXATEL_GUID:" + AXATEL_GUID + "--B24_URL:" + B24_URL + "--FILE_CONTENT:" + filecont + "--PROCES_STATUS:" + PROCES_STATUS + "--URL:" + URL + "--\n\n");
             }
@@ -199,7 +200,7 @@ namespace Axatel.Controllers
             RefSetToken(B24_URL);
             Compan co = _db.Compans.Where(p => p.Portal == B24_URL && p.AxatelGuid == AXATEL_GUID).FirstOrDefault();
             if (co == null) { return Content("Портал не найден"); }
-
+            
             func.Record(CALL_Guid, B24_URL, FILE_CONTENT, URL, co.BackIp, co.AcesTok);
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
@@ -1625,6 +1626,18 @@ namespace Axatel.Controllers
         }
         public ActionResult Roistat(Auths auth, string numb)
         {
+            string pach = System.Web.Hosting.HostingEnvironment.MapPath("/log.txt");
+            System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
+            try
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "--Roistat--auth.token:" + auth.token + "--numb:" + numb + "\r\n");
+            }
+            catch
+            {
+                myfile.WriteLine(DateTime.Now.ToString() + "--FinishCall--Ошибка логирования--\n\n");
+            }
+            myfile.Close();
+            myfile.Dispose();
             RoisConfig rc = _db.RoisConfigs.Where(i => i.Token == auth.token).FirstOrDefault();
             if (rc == null)
             {
@@ -1653,7 +1666,7 @@ namespace Axatel.Controllers
                 DataOtvet d_o = new DataOtvet();
                 d_o.priority = lstgroup.Where(i => i.Id == item).FirstOrDefault().Priority.ToString();
                 d_o.timeout_seconds = lstgroup.Where(i => i.Id == item).FirstOrDefault().TimeSec;
-                d_o.phones = roiscols.Where(i => i.IdGroup == item).Select(q => q.Number).ToArray();
+                d_o.phones = roiscols.Where(i => i.IdGroup == item).Select(q => q.Number.Trim()).ToArray();
                 datas.Add(d_o);
             }
 

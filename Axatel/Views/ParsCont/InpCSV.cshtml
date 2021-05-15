@@ -1,0 +1,45 @@
+﻿
+@{
+   
+    string idmemb = ViewBag.memberid;
+   
+
+
+}
+<html lang="ru">
+<head>
+    <meta http-equiv="content-language" content="ru">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <title>Импорт завершен!</title>
+    <!-- Custom styles for this template -->
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery-1.11.3.min.js"></script>
+
+</head>
+<body>
+    <div class="body-content">
+        @Html.Partial("/Views/Shared/header.cshtml", idmemb)
+        <div class="main" style="max-width: 1300px;">
+
+            <h2>Импорт завершен!</h2>
+            <div>Всего записей: <b>@ViewBag.allcount</b></div>
+            <div>Импортировано после фильтрации: <b>@ViewBag.filtcount</b></div>
+            <div><a href="/tablabon?member_id=@idmemb">Продолжить</a></div>
+        </div>
+
+        <footer style="margin-top:70px;">
+                <p>
+                    &copy; @DateTime.Now.Year - Все права защищены. Powered by AXATA
+                </p>
+            </footer>
+    </div>
+
+
+
+
+</body>
+</html>

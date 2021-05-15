@@ -27,7 +27,7 @@ namespace Axatel.Controllers
         public ActionResult LoadUser(string Portal, string Guid, string Token, string Backip, int[] iduser = null, int[] inernumb = null)
         {
             //  List<Function.UserGetApi> listusapi = new List<Function.UserGetApi>();
-            
+
             amoCompan co = _db.amoCompans.Where(p => p.PortalName == Portal).FirstOrDefault();
             co.AxatelGuid = Guid;
             co.BackIp = Backip;
@@ -130,7 +130,7 @@ namespace Axatel.Controllers
         }
 
 
-        public ActionResult Index(string code = "", string referer = "", string client_id="", string from_widget="")
+        public ActionResult Index(string code = "", string referer = "", string client_id = "", string from_widget = "")
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/logamo.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
@@ -190,7 +190,7 @@ namespace Axatel.Controllers
             //  Response.Headers.Add("Access-Control-Allow-Origin", "https://service-axatel.ru");
             return View();
         }
-        public ActionResult Reg(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID, int VI_STATUS, string TYPE, string CALL_FINISH_DATE="", int? DURATION= 0, int USER_PHONE_INNER = 0, string URL = "")
+        public ActionResult Finish(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID, int VI_STATUS, string TYPE, string CALL_FINISH_DATE = "", int? DURATION = 0, int USER_PHONE_INNER = 0, string URL = "")
         {
             string pach = System.Web.Hosting.HostingEnvironment.MapPath("/logamo.txt");
             System.IO.StreamWriter myfile = new System.IO.StreamWriter(pach, true);
@@ -227,24 +227,57 @@ namespace Axatel.Controllers
             string otv = "";
             if (USER_PHONE_INNER == 0)
             {
-                otv = func.GetUsers(co.PortalName, co.AcesTok);
+                if (string.IsNullOrEmpty(co.IdOtvetstv))
+                {
+                    otv = func.GetUsers(co.PortalName, co.AcesTok);
+                }
+                else
+                {
+                    otv = co.IdOtvetstv;
+                }
             }
             else
             {
 
-                otv = _db.amoOperators.Where(i=>i.InerNumb == USER_PHONE_INNER).FirstOrDefault().AmoId.ToString();
+                otv = _db.amoOperators.Where(i => i.InerNumb == USER_PHONE_INNER).Where(p => p.PortalId == co.Id).FirstOrDefault().AmoId.ToString();
             }
-            if (func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER) == null)
+
+            string[] have = new string[3];
+            have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER);
+            if (have == null)
             {
-                func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv);
+                have = new string[3];
+                if (string.IsNullOrEmpty(co.IdOtvetstv))
+                {
+                    have[0] = func.GetUsers(co.PortalName, co.AcesTok); //ответственный за контакт
+                }
+                else
+                {
+                    have[0] = co.IdOtvetstv; //ответственный за контакт
+                }
             }
-             
+
+
             //  if (co == null) { return Content("Портал не найден"); }
 
             //func.ShowEvent(co.PortalName, co.AcesTok, telefon, userid);
-            URL = "http://" + co.BackIp + URL;
-            func.RegisterCall(co.PortalName, co.AcesTok, PHONE_NUMBER, otv,  VI_STATUS, TYPE, URL, CALL_FINISH_DATE, DURATION);
+            if (URL.IndexOf("http") == -1)
+            {
+                URL = "http://" + co.BackIp + URL;
+            }
 
+            func.RegisterCall(co.PortalName, co.AcesTok, PHONE_NUMBER, otv, VI_STATUS, TYPE, URL, CALL_FINISH_DATE, DURATION);
+            if (VI_STATUS ==6)
+            {
+                int idtasktype = 1;
+                int identity = 0;
+                try { identity = Convert.ToInt32(have[2]); } catch { }
+                if (!string.IsNullOrEmpty(co.IdTypeTask))
+                {
+                    idtasktype = Convert.ToInt32(co.IdTypeTask);
+                }
+                func.CreatTask(co.PortalName, co.AcesTok, otv, have[0], identity, idtasktype);
+            }
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
         // входящий звонок
@@ -285,170 +318,316 @@ namespace Axatel.Controllers
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult RegContact(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID)
+        //public ActionResult RegContact(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID)
+        //{
+        //    RefSetToken(AMO_URL);
+        //    amoCompan co = _db.amoCompans.Where(p => p.PortalName == AMO_URL).Where(a => a.AxatelGuid == AXATEL_GUID).FirstOrDefault();
+        //    if (co == null) { return Content("Портал не найден"); }
+
+        //    string otv = func.GetUsers(co.PortalName, co.AcesTok); // получаем ид любого админа
+        //    string[] datauser = new string[3];
+        //    string[] have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER);
+        //    if (have == null)
+        //    {
+        //        datauser[0] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта
+        //        datauser[1] = "Новый контакт";
+        //        datauser[2] = "0";
+
+
+        //    }
+        //    else
+        //    {
+        //        int iduser = Convert.ToInt32(have[0]);
+        //        datauser[0] = have[0];
+        //        datauser[1] = have[1];
+        //        try
+        //        {
+        //            datauser[2] = _db.amoOperators.Where(i => i.AmoId == iduser).FirstOrDefault().InerNumb.ToString();
+        //        }
+        //        catch
+        //        {
+        //            datauser[2] = "0";
+        //        }
+        //    }
+        //    return Json(new { idcont = datauser[0], namecont = datauser[1], inernumb = datauser[2] }, JsonRequestBehavior.AllowGet);
+        //}
+        [HttpPost]
+        public ActionResult RegContact(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID, string TYPE = "", string LINE_NUMBER = "")
         {
-            RefSetToken(AMO_URL);
-            amoCompan co = _db.amoCompans.Where(p => p.PortalName == AMO_URL).Where(a => a.AxatelGuid == AXATEL_GUID).FirstOrDefault();
-            if (co == null) { return Content("Портал не найден"); }
-
-            string otv = func.GetUsers(co.PortalName, co.AcesTok); // получаем ид любого админа
-            string[] datauser = new string[3];
-            string[] have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER);
-            if (have == null)
+            //try
+            //{
+                RefSetToken(AMO_URL);
+                amoCompan co = _db.amoCompans.Where(p => p.PortalName == AMO_URL).Where(a => a.AxatelGuid == AXATEL_GUID).FirstOrDefault();
+                if (co == null) { return Content("Портал не найден"); }
+            string otv = "";
+            if (string.IsNullOrEmpty(co.IdOtvetstv))
             {
-                datauser[0] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта
-                datauser[1] = "Новый контакт";
-                datauser[2] = "0";
-
-              
+                otv = func.GetUsers(co.PortalName, co.AcesTok); // получаем ид любого админа
+            }else
+            {
+                otv = co.IdOtvetstv;
             }
-            else
-            {
-                int iduser = Convert.ToInt32(have[0]);
-                datauser[0] = have[0];
-                datauser[1] = have[1];
+                string[] have = new string[3];
+                have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER); // 0- ответсвенный, 1- имя контакта, 2- ид контакта
+                //List<string> lststatus = func.StatusDeal(co.PortalName, co.AcesTok);// список ид пропускных статусов сделок
+                if (string.IsNullOrEmpty(co.IdDopFildDeal)) // если не назначено ид доп поля то создаем
+                {
+                    string idfild = func.CreatDopFildDeal(co.PortalName, co.AcesTok);
+                    co.IdDopFildDeal = idfild;
+                    _db.Entry(co).State = System.Data.Entity.EntityState.Modified;
+                    _db.SaveChanges();
+                }
+
+                if ((TYPE == "inbound") || (TYPE ==""))
+                {
+                    if (co.InCall == "cont")
+                    {
+                        if (have == null)
+                        {
+                            have = new string[3];
+                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                    }
+                    else if (co.InCall == "deal")
+                    {
+                        if (have == null)
+                        {
+                            have = new string[3];
+                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                        }
+                        // bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+                        // if (havedeals2 == false)
+                        //  {
+                        Dictionary<string, string> dicdop = new Dictionary<string, string>();
+                        AmoSurceNumb sn = _db.AmoSurceNumbs.Where(p => p.PortalName == co.PortalName).Where(n => n.Number == LINE_NUMBER).FirstOrDefault();
+                        string namedop = "Прямой трафик";
+                        if (sn != null) {
+                            namedop = sn.NameSurce;                                                   
+                        }
+                    dicdop.Add(co.IdDopFildDeal, namedop.Trim());
+
+                    if (sn != null)
+                    {
+                        if ((!string.IsNullOrEmpty(co.IdDopFildDeal2)) && (!string.IsNullOrEmpty(sn.NameSurce2)))
+                        {
+                            dicdop.Add(co.IdDopFildDeal2, sn.NameSurce2.Trim());
+                        }
+                        if ((!string.IsNullOrEmpty(co.IdDopFildDeal3)) && (!string.IsNullOrEmpty(sn.NameSurce3)))
+                        {
+                            dicdop.Add(co.IdDopFildDeal3, sn.NameSurce3.Trim());
+                        }
+                    }
+                  
+                        string Tag = "";
+                        if (co.TagCall != 0) { Tag = LINE_NUMBER; }
+
+                    bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2])/*, lststatus*/); // true если есть активные сделки
+                    if (havedeals2 == false)
+                        { 
+                            func.CreatDeal(co.PortalName, co.AcesTok, 0, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, dicdop);
+                        }
+                    }
+
+                }
+                else
+                {
+                    if (have == null)
+                    {
+                        have = new string[3];
+                        have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+                    }
+                }
+                string inernumb, namecont = "Новый контакт";
+
                 try
                 {
-                    datauser[2] = _db.amoOperators.Where(i => i.AmoId == iduser).FirstOrDefault().InerNumb.ToString();
+                    int idotv = Convert.ToInt32(have[0]);
+                    inernumb = _db.amoOperators.Where(i => i.AmoId == idotv).FirstOrDefault().InerNumb.ToString();
                 }
                 catch
                 {
-                    datauser[2] = "0";
+                    inernumb = "0";
                 }
-            }
-            return Json(new { idcont = datauser[0], namecont = datauser[1], inernumb = datauser[2] }, JsonRequestBehavior.AllowGet);
+                if (have[1] != null)
+                {
+                    try { namecont = have[1]; }
+                    catch
+                    {
+                    }
+                }
+                return Json(new { idcont = have[2], namecont = namecont, inernumb = inernumb }, JsonRequestBehavior.AllowGet);
+            //}
+            //catch(Exception ex)
+            //{
+            //    return Json(new { status="Ошибка", desc= ex.Message, trace = ex.StackTrace, titl =ex.ToString()}, JsonRequestBehavior.AllowGet);
+            //}
+
         }
+        //public ActionResult CreatDeal(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID, string Link, int Duration, string Type,  int Cosht=0, string Tag="")
+        //{
+        //    RefSetToken(AMO_URL);
+        //    amoCompan co = _db.amoCompans.Where(p => p.PortalName == AMO_URL).Where(a => a.AxatelGuid == AXATEL_GUID).FirstOrDefault();
+        //    if (co == null) { return Content("Портал не найден"); }
+        //    string otv = func.GetUsers(co.PortalName, co.AcesTok); // получаем ид любого админа
+        //    string[] have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER); // 0- ответсвенный, 1- имя контакта, 2- ид контакта
+        //    List<string> lststatus = func.StatusDeal(co.PortalName, co.AcesTok);// список ид пропускных статусов сделок
+        //     if (string.IsNullOrEmpty(co.IdDopFildDeal)) // если не назначено ид доп поля то создаем
+        //    {
+        //        string idfild = func.CreatDopFildDeal(co.PortalName, co.AcesTok);
+        //        co.IdDopFildDeal = idfild;
+        //        _db.Entry(co).State = System.Data.Entity.EntityState.Modified;
+        //        _db.SaveChanges();
+        //    }
 
-        public ActionResult CreatDeal(string AMO_URL, string PHONE_NUMBER, string AXATEL_GUID, string Link, int Duration, string Type,  int Cosht=0, string Tag="")
+        //    switch (Type)
+        //    {
+        //        case "incoming":
+        //            if(co.InCall == "none")
+        //            {
+        //                break;
+        //            }else if (co.InCall == "cont")
+        //            {                       
+        //                if (have == null)
+        //                {
+        //                    func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //            }else if (co.InCall == "deal")
+        //            {
+        //                if (have == null)
+        //                {
+        //                    have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //                bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+        //                if (havedeals2 == false)
+        //                {
+        //                    if (co.TagCall == 0) { Tag = ""; }
+        //                     func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, co.IdDopFildDeal, "Второй");                           
+        //                }
+        //            }
+        //            else if (co.InCall == "neraz")
+        //            {
+        //                if (have == null)
+        //                {
+        //                    have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //                bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+        //                if (havedeals2 == false)
+        //                {
+        //                    if (co.TagCall == 0) { Tag = ""; }
+        //                    func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration, co.IdDopFildDeal, "Второй");
+        //                }
+        //            }
+        //                break;
+        //        case "outgoing":
+        //            if (co.OutCall == "none")
+        //            {
+        //                break;
+        //            }
+        //            else if (co.OutCall == "cont")
+        //            {
+        //                if (have == null)
+        //                {
+        //                    func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //            }
+        //            else if (co.OutCall == "deal")
+        //            {
+        //                if (have == null)
+        //                {
+        //                    have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //                bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+        //                if (havedeals2 == false)
+        //                {
+        //                    if (co.TagCall == 0) { Tag = ""; }
+        //                    func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER,co.IdDopFildDeal, "Второй");
+        //                }
+        //            }
+        //            else if (co.OutCall == "neraz")
+        //            {
+        //                if (have == null)
+        //                {
+        //                    have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //                bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+        //                if (havedeals2 == false)
+        //                {
+        //                    if (co.TagCall == 0) { Tag = ""; }
+        //                    func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration, co.IdDopFildDeal, "Второй");
+        //                }
+        //            }
+        //            break;
+        //        case "missed":
+        //            if (co.BadCall == "none")
+        //            {
+        //                break;
+        //            }
+        //            else if (co.BadCall == "cont")
+        //            {
+        //                if (have == null)
+        //                {
+        //                    func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //            }
+        //            else if (co.BadCall == "deal")
+        //            {
+        //                if (have == null)
+        //                {
+        //                    have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //                bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+        //                if (havedeals2 == false)
+        //                {
+        //                    if (co.TagCall == 0) { Tag = ""; }
+        //                    func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, co.IdDopFildDeal, "Второй");
+        //                }
+        //            }
+        //            else if (co.BadCall == "neraz")
+        //            {
+        //                if (have == null)
+        //                {
+        //                    have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
+        //                }
+        //                bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
+        //                if (havedeals2 == false)
+        //                {
+        //                    if (co.TagCall == 0) { Tag = ""; }
+        //                    func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration, co.IdDopFildDeal, "Второй");
+        //                }
+        //            }
+        //            break;
+        //        default:                   
+        //            break;
+        //    }           
+        //    return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
+        //}
+        public ActionResult GetParam(string portal)
         {
-            RefSetToken(AMO_URL);
-            amoCompan co = _db.amoCompans.Where(p => p.PortalName == AMO_URL).Where(a => a.AxatelGuid == AXATEL_GUID).FirstOrDefault();
+            amoCompan co = _db.amoCompans.Where(p => p.PortalName == portal).FirstOrDefault();
             if (co == null) { return Content("Портал не найден"); }
-            string otv = func.GetUsers(co.PortalName, co.AcesTok); // получаем ид любого админа
-            string[] have = func.isHaveCont(co.PortalName, co.AcesTok, PHONE_NUMBER); // 0- ответсвенный, 1- имя контакта, 2- ид контакта
-            List<string> lststatus = func.StatusDeal(co.PortalName, co.AcesTok);// список ид пропускных статусов сделок
+            string statted = "";
+            if (co.TagCall == 1) { statted = "on"; }
+            else if (co.TagCall == 0) { statted = "off"; }
+            string statinb = "";
+            if (co.InCall == "deal") { statinb = "Контакт и сделка"; }
+            else if (co.InCall == "cont") { statinb = "Контакт"; }
+            return Json(new { portal = co.PortalName, statget = statted, statinbound = statinb },  JsonRequestBehavior.AllowGet);
 
-            switch (Type)
-            {
-                case "incoming":
-                    if(co.InCall == "none")
-                    {
-                        break;
-                    }else if (co.InCall == "cont")
-                    {                       
-                        if (have == null)
-                        {
-                            func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                    }else if (co.InCall == "deal")
-                    {
-                        if (have == null)
-                        {
-                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
-                        if (havedeals2 == false)
-                        {
-                            if (co.TagCall == 0) { Tag = ""; }
-                             func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER);                           
-                        }
-                    }
-                    else if (co.InCall == "neraz")
-                    {
-                        if (have == null)
-                        {
-                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
-                        if (havedeals2 == false)
-                        {
-                            if (co.TagCall == 0) { Tag = ""; }
-                            func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration);
-                        }
-                    }
-                        break;
-                case "outgoing":
-                    if (co.OutCall == "none")
-                    {
-                        break;
-                    }
-                    else if (co.OutCall == "cont")
-                    {
-                        if (have == null)
-                        {
-                            func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                    }
-                    else if (co.OutCall == "deal")
-                    {
-                        if (have == null)
-                        {
-                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
-                        if (havedeals2 == false)
-                        {
-                            if (co.TagCall == 0) { Tag = ""; }
-                            func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER);
-                        }
-                    }
-                    else if (co.OutCall == "neraz")
-                    {
-                        if (have == null)
-                        {
-                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
-                        if (havedeals2 == false)
-                        {
-                            if (co.TagCall == 0) { Tag = ""; }
-                            func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration);
-                        }
-                    }
-                    break;
-                case "missed":
-                    if (co.BadCall == "none")
-                    {
-                        break;
-                    }
-                    else if (co.BadCall == "cont")
-                    {
-                        if (have == null)
-                        {
-                            func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                    }
-                    else if (co.BadCall == "deal")
-                    {
-                        if (have == null)
-                        {
-                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
-                        if (havedeals2 == false)
-                        {
-                            if (co.TagCall == 0) { Tag = ""; }
-                            func.CreatDeal(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER);
-                        }
-                    }
-                    else if (co.BadCall == "neraz")
-                    {
-                        if (have == null)
-                        {
-                            have[2] = func.CreatCont(co.PortalName, co.AcesTok, PHONE_NUMBER, otv); // получаем ид контакта                           
-                        }
-                        bool havedeals2 = func.ifhaveDeals(co.PortalName, co.AcesTok, Convert.ToInt32(have[2]), lststatus); // true если есть активные сделки
-                        if (havedeals2 == false)
-                        {
-                            if (co.TagCall == 0) { Tag = ""; }
-                            func.CreatRazobrab(co.PortalName, co.AcesTok, Cosht, Convert.ToInt32(have[2]), Convert.ToInt32(otv), Tag, PHONE_NUMBER, Link, Duration);
-                        }
-                    }
-                    break;
-                default:                   
-                    break;
-            }           
-            return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult SetParam(string portal, string guid, string statget, string statinbound)
+        {
+            amoCompan co = _db.amoCompans.Where(p => p.PortalName == portal).Where(a=>a.AxatelGuid == guid).FirstOrDefault();
+            if (co == null) { return Content("Портал не найден"); }
+          
+            if (statget == "on") { co.TagCall = 1; }
+            else if (statget == "off") { co.TagCall = 0; }
+           
+            if (statinbound == "deal") { co.InCall = "deal"; }
+            else if (statinbound == "cont") { co.InCall = "cont"; }
+            _db.Entry(co).State = System.Data.Entity.EntityState.Modified;
+            _db.SaveChanges();
+            return Json(new { status = "Сохранено!" }, JsonRequestBehavior.AllowGet);
+
         }
 
 

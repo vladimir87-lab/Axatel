@@ -52,3 +52,12 @@
 02.11.2020 16:05:59--RegLead--AXATEL_GUID:ceb9906c-0a24-4d7b-a8f4-f6e8f381c355--B24_URL:axata.bitrix24.ru--PHONE_NUMBER:+375291554493--LINE_NUMBER:375173880981--INNER_PHONE:311--Lead_name:Лид с сайта
 
 
+05.03.2021 17:59:57--Record--AXATEL_GUID:ceb9906c-0a24-4d7b-a8f4-f6e8f381c354--B24_URL:axata.bitrix24.ru--FILE_CONTENT:--PROCES_STATUS:1--URL:http://axata.bitrix24.ru/callrecords/domains/axata.a1.axatel.by/data/20201128/mjm3njexmdix888888.mp3--
+
+
+05.03.2021 18:00:21--Record--AXATEL_GUID:ceb9906c-0a24-4d7b-a8f4-f6e8f381c354--B24_URL:axata.bitrix24.ru--FILE_CONTENT:--PROCES_STATUS:1--URL:http://axata.bitrix24.ru/callrecords/domains/axata.a1.axatel.by/data/20201128/mjm3njexmdix888888.mp3--
+
+
+30.03.2021 15:00:19--RegCall--AXATEL_GUID:4ac5f618-9f20-4805-8eea-97cd3a259c47--B24_URL:wiseengineering.bitrix24.ru--PHONE_NUMBER:+375296375499--CALL_START_DATE:2021-03-30 14:23:32--TYPE:2--CRM_CREATE:1--PROCES_STATUS:--USER_PHONE_INNER:0--LINE_NUMBER:Yeastar_A1--
+
+

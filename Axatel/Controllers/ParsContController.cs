@@ -22,6 +22,7 @@ namespace Axatel.Controllers
         ExpandoObjectConverter converter = new ExpandoObjectConverter();
         public SqlConnection conn;
         public string connstr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+        //фильтр обработки номеров
         public string FilterNumber(string tel)
         {
            
@@ -405,14 +406,17 @@ namespace Axatel.Controllers
             int countdeal = alldate.Where(l => l[4].ToString() == "deal").Count();
             int countcomp = alldate.Where(l => l[4].ToString() == "comp").Count();
             int countcont = alldate.Where(l => l[4].ToString() == "cont").Count();
+            int countimp = alldate.Where(l => l[4].ToString() == "insert").Count();
 
 
             ViewBag.countlid = countlid;
             ViewBag.countdeal = countdeal;
             ViewBag.countcomp = countcomp;
             ViewBag.countcont = countcont;
+            ViewBag.countimp = countimp;
 
-            
+
+
             List<TaskAbonent> lsttask = _db.TaskAbonents.Where(i => i.PortalName == comp.Portal).ToList();
             ViewBag.LastTask = lsttask;
             ViewBag.MainId = comp.IdMainTblAbon;
@@ -423,6 +427,7 @@ namespace Axatel.Controllers
             ViewBag.TypeCont = typecont;
             ViewBag.TypeComp = typecomp;
             ViewBag.IsWork = iswork;
+            ViewBag.Telbot = comp.VoiceBotNumber;
             ViewBag.Filternumb = isfilter;
             ViewBag.StadeDeal = stadedeal;
             ViewBag.memberid = member_id;
@@ -1204,6 +1209,7 @@ namespace Axatel.Controllers
             return Json(new { count = timeent.Count });
 
         }
+        // выдача номеров
         public JsonResult Number(string AxatelGUID, string Type, string IdTask)
         {
             Compan comp = _db.Compans.Where(i => i.AxatelGuid == AxatelGUID).FirstOrDefault();
@@ -1244,11 +1250,20 @@ namespace Axatel.Controllers
                 IdTask = IdTask,
                 DateTime = td,
                 IdNumber = row[1],
-                Number = row[2]
+                Number = row[2],
+                VoiceBotNumber = comp.VoiceBotNumber
             };
             return Json(new { success = "true", data });
         }
-       
+       // сохраняем настройку телефона для бота
+        public ActionResult SaveVoiceBot( string member_id, string Telef)
+        {
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
+            comp.VoiceBotNumber = Telef.Trim();
+            _db.Entry(comp).State = System.Data.Entity.EntityState.Modified;
+            _db.SaveChanges();
+            return Content("ok");
+        }
 
         public JsonResult Finish(string AxatelGUID, string DateTime, string CALLID, string IdTask, string IdNumber, string AbonentNumber, string DateTimeStart, string DateTimeStop, string OperatorID, int OperatorNumder, string OperatorDisplayNane, int LenQueue, int LenTime, string AbonentInfo, string CallResult,  string URLRec)
         {
@@ -1276,7 +1291,7 @@ namespace Axatel.Controllers
             };
             return Json(new { success = "true", data });
         }
-
+        // включить отключить работу абонентов
         public JsonResult Onworkabon(string type, string member_id)
         {           
            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
@@ -1325,6 +1340,7 @@ namespace Axatel.Controllers
             DellEntity(nametbl, "cont");
             DellEntity(nametbl, "comp");
             DellEntity(nametbl, "lead");
+            DellEntity(nametbl, "insert");
             return RedirectToAction("Index", new { member_id = member_id });
         }
         public ActionResult ClearIsgetStat(string member_id)
@@ -1355,6 +1371,50 @@ namespace Axatel.Controllers
             }
             return Redirect("/Content/csv/" + taskab.Guid + ".csv");
 
+        }
+
+        // импорт из цсв в таблицу
+        public ActionResult InpCSV(string member_id, HttpPostedFileBase file)
+        {
+            if (file == null) { return Redirect("/tablabon?member_id="+ member_id); }
+            Compan comp = _db.Compans.Where(i => i.MemberId == member_id).FirstOrDefault();
+            TaskAbonent taskab = _db.TaskAbonents.Where(a => a.PortalName == comp.Portal).Where(q => q.Id == comp.IdMainTblAbon).FirstOrDefault();
+            Stream streamfile = file.InputStream;
+            List<TimeEntit> col = new List<TimeEntit>();            
+            using (StreamReader rd = new StreamReader(streamfile, System.Text.Encoding.UTF8))
+            {
+                string[] str = rd.ReadToEnd().Split(new string[] { "\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+                foreach(var item in str)
+                {
+                    string fitem = new string(item.Where(t => char.IsDigit(t)).ToArray());
+                    if (fitem ==""){ continue; }
+                    TimeEntit te = new TimeEntit();
+                    te.IdEntit = 0;
+                    te.PortalName = comp.Portal;
+                    te.Telefon = fitem.ToString();
+                    te.Type = "insert";
+                    col.Add(te);
+                }
+
+            }
+            int allcount = col.Count;
+            List<object[]> alldate = SelAllData(taskab.Guid);
+            List<TimeEntit> newtimeent = col.Where(i => alldate.Select(s => s[2]).Contains(i.Telefon)).ToList();
+            foreach (var item in newtimeent)
+            {
+                col.Remove(item);
+            }
+            if (taskab.isFilterNumb == 1)
+            {
+                col.ToList().ForEach(x => x.Telefon = FilterNumber(x.Telefon));
+                col = col.Where(t => t.Telefon != "").ToList();
+            }
+            InsertEntity(taskab.Guid, col);
+            int filtcount = col.Count;
+            ViewBag.memberid = member_id;
+            ViewBag.filtcount = filtcount;
+            ViewBag.allcount = allcount;
+            return View();
         }
 
         public JsonResult SendnewTable( string name, string member_id)

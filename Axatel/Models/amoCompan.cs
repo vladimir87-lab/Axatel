@@ -22,6 +22,12 @@ namespace Axatel.Models
         public string OutCall { get; set; }
         public string BadCall { get; set; }
         public int TagCall { get; set; }
+        public string IdDopFildDeal { get; set; }
+        public string IdDopFildDeal2 { get; set; }
+        public string IdDopFildDeal3 { get; set; }
+        public string IdTypeTask { get; set; }
+        public string IdOtvetstv { get; set; }
+
 
     }
 }

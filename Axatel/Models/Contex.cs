@@ -28,6 +28,7 @@ namespace Axatel.Models
         public DbSet<RoistNumb> RoistNumb { get; set; }
         public DbSet<RoisConfig> RoisConfigs { get; set; }
         public DbSet<RoisGroup> RoisGroups { get; set; }
+        public DbSet<AmoSurceNumb> AmoSurceNumbs { get; set; }
 
 
 

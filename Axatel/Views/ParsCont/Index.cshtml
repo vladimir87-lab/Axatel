@@ -322,6 +322,10 @@
                                     <button style="padding: 2px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none; background: #ca0505;border: 1px solid #8c0202;" onclick="delltabl()">Удалить</button>
                                 </div>
                             </div>
+                            <div style="padding: 5px 5px 5px 20px;">
+                                <span>4. Настройка голосового робота</span><br>
+                               <input id="voicebottel" value="@ViewBag.Telbot" placeholder="Введите номер бота" style="padding: 5px 10px;border-radius: 2px;color: #444343 !important;text-decoration: none;" ><button style="padding: 2px 7px;border-radius: 2px;color: #f2f2f2 !important;margin-left: 10px;text-decoration: none;" id="butsettable" onclick="sevnumb()">Сохранить</button><span id="otvetbotvoice" style="color:green;"></span>
+                            </div>
                         </div>
 
                     </div>
@@ -332,6 +336,7 @@
                     <p style="margin: 0px;">Контактов: <b><span id="totcont">@ViewBag.countcont</span></b></p>
                     <p style="margin: 0px;">Сделок: <b><span id="totdeal">@ViewBag.countdeal</span></b></p>
                     <p style="margin: 0px;">Компаний: <b><span id="totcomp">@ViewBag.countcomp</span></b></p>
+                    <p style="margin: 0px;">Импортированных: <b><span id="totimp">@ViewBag.countimp</span></b></p>
                     <hr>
                     <p style="margin: 0px;">Статистика:</p>
                     <p style="margin: 0px;">Всего номеров: <b><span id="totnum">0</span></b></p>
@@ -341,8 +346,12 @@
                         <a href="/cleardata?member_id=@idmemb">Очистить таблицу</a>
                         <a style="margin-left:15px;" href="/clearisgetstat?member_id=@idmemb">Очистить статистику</a>
                     </div>
-                    <div style="float: right;padding: 10px;">
-                        <a href="/excsv?member_id=@idmemb" style="background-color: #28b73e;border: 1px solid #249714;padding: 3px 10px;color: white !important;">Скачать CSV</a>
+                    <div style="float: right;padding: 10px;width: 400px;">
+                        <a href="/excsv?member_id=@idmemb" style="display: inline-block; vertical-align: top; background-color: #28b73e;border: 1px solid #249714;padding: 3px 10px;color: white !important;">Скачать CSV</a>
+                        <form action="/inpcsv?member_id=@idmemb" method="post" enctype="multipart/form-data" style="display: inline-block;text-align: center;">
+                            <input type="file" name="file"  >
+                            <input type="submit" value="Загрузить CSV" style="background-color: #28b73e;border: 1px solid #249714;padding: 3px 10px;color: white !important;margin: 5px;">
+                        </form>
                     </div>
                 </div>
 
@@ -375,6 +384,20 @@
             });
         }
 
+        function sevnumb() {
+            var tel = $('#voicebottel').val();
+            $.ajax({
+                type: "POST",
+                url: "/savevoicebot",
+                data: { member_id: '@ViewBag.memberid', Telef: tel },
+                success: function (data) {
+                    if (data == 'ok') {
+                        $('#otvetbotvoice').text('Сохранено!');
+                    }
+                }
+            });
+        }
+
         function setstat() {
             $.ajax({
                 type: "POST",
@@ -384,9 +407,7 @@
                     $('#totnum').text(data['total']);
                     $('#totnumget').text(data['totalsend']);
                     var proc = (data['totalsend'] / data['total']) * 100;
-                    $('#totnumgetproc').text(proc.toFixed(1));
-                    
-                   
+                    $('#totnumgetproc').text(proc.toFixed(1));                                      
                 }
             });
         }

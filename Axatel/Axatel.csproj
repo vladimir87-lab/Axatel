@@ -186,6 +186,7 @@
     <Compile Include="Models\AlfaCompan.cs" />
     <Compile Include="Models\amoCompan.cs" />
     <Compile Include="Models\amoOperator.cs" />
+    <Compile Include="Models\AmoSurceNumb.cs" />
     <Compile Include="Models\BlackList.cs" />
     <Compile Include="Models\Compan.cs" />
     <Compile Include="Models\Contex.cs" />
@@ -254,6 +255,7 @@
     <Content Include="Views\Home\Script.cshtml" />
     <Content Include="Views\ParsCont\Index.cshtml" />
     <Content Include="Views\ParsCont\SearchLead.cshtml" />
+    <Content Include="Views\ParsCont\InpCSV.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
